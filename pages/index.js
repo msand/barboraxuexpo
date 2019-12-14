@@ -37,7 +37,7 @@ export default function Page({ data, etag, meta = {} }) {
       {data.allWorks.map(({ id, title, slug, excerpt, coverImage }) => (
         <View key={id} style={styles.showcase_item}>
           <View style={styles.card}>
-            <Link href="/works/[pid]" as={`/works/${slug}`}>
+            <Link href="/works/[slug]" as={`/works/${slug}`}>
               <a>
                 <img
                   width={450}
@@ -49,7 +49,7 @@ export default function Page({ data, etag, meta = {} }) {
             </Link>
             <View style={styles.card_caption}>
               <Text style={styles.card_title}>
-                <Link href="/works/[pid]" as={`/works/${slug}`}>
+                <Link href="/works/[slug]" as={`/works/${slug}`}>
                   <a>{title}</a>
                 </Link>
               </Text>
