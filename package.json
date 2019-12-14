@@ -5,7 +5,8 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build && next export",
+    "build": "next build",
+    "export": "next build && next export",
     "start": "next start",
     "expo": "expo start",
     "android": "expo start --android",
