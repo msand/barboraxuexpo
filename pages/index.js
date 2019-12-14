@@ -49,7 +49,7 @@ export default function Page({ data, etag, meta = {} }) {
             </Link>
             <View style={styles.card_caption}>
               <Text style={styles.card_title}>
-                <Link href={`/works/${slug}`}>
+                <Link href="/works/[pid]" as={`/works/${slug}`}>
                   <a>{title}</a>
                 </Link>
               </Text>

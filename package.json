@@ -5,9 +5,9 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "export": "npm run build && next export",
-    "start": "expo start",
+    "build": "next build && next export",
+    "start": "next start",
+    "expo": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
