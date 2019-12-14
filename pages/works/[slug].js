@@ -4,6 +4,7 @@ import { query } from '../../src/data/datocms';
 import Slider from 'react-slick';
 import gql from 'graphql-tag';
 import { useFocus } from '../../src/hooks/useFocus';
+import Link from 'next/link';
 
 const Work = ({ work, etag }) => {
   const focused = useFocus();
@@ -24,6 +25,9 @@ const Work = ({ work, etag }) => {
   return (
     <View style={styles.sheet}>
       <View style={styles.sheet_inner}>
+        <Link href="/">
+          <a>Home</a>
+        </Link>
         <Text style={styles.sheet_title}>{work.title}</Text>
         <Text style={styles.sheet_lead}>{work.excerpt}</Text>
         <View style={styles.sheet_slider}>
@@ -69,7 +73,9 @@ const styles = StyleSheet.create({
 
 export default Work;
 
-Work.getInitialProps = async ({ res, query: { slug } }) => {
+Work.getInitialProps = async props => {
+  const { res, asPath } = props;
+  const slug = asPath.slice('/works/'.length);
   const result = await query(workQuery, { slug });
   const { data } = result;
   const etag = require('crypto')
