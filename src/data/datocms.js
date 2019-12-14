@@ -26,4 +26,4 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-export const query = query => client.query({ query });
+export const query = (query, variables) => client.query({ query, variables });

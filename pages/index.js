@@ -34,35 +34,32 @@ export default function Page({ data, etag, meta = {} }) {
 
       <Text style={styles.text}>Welcome to Expo + Next.js 👋</Text>
 
-      {data.allWorks.map(({ id, title, slug, excerpt, coverImage }) => {
-        console.log(coverImage);
-        return (
-          <View key={id} style={styles.showcase_item}>
-            <View style={styles.card} d>
-              <Link href={`/works/${slug}`} style={styles.card_image}>
-                <a>
-                  <img
-                    width={450}
-                    style={{ maxWidth: '100%' }}
-                    src={coverImage.url}
-                    alt={coverImage.alt}
-                  />
-                </a>
-              </Link>
-              <View style={styles.card_caption}>
-                <Text style={styles.card_title}>
-                  <Link href={`/works/${slug}`}>
-                    <a>{title}</a>
-                  </Link>
-                </Text>
-                <View style={styles.card_description}>
-                  <Text>{excerpt}</Text>
-                </View>
+      {data.allWorks.map(({ id, title, slug, excerpt, coverImage }) => (
+        <View key={id} style={styles.showcase_item}>
+          <View style={styles.card}>
+            <Link href="/works/[pid]" as={`/works/${slug}`}>
+              <a>
+                <img
+                  width={450}
+                  style={{ maxWidth: '100%' }}
+                  src={coverImage.url}
+                  alt={coverImage.alt}
+                />
+              </a>
+            </Link>
+            <View style={styles.card_caption}>
+              <Text style={styles.card_title}>
+                <Link href={`/works/${slug}`}>
+                  <a>{title}</a>
+                </Link>
+              </Text>
+              <View style={styles.card_description}>
+                <Text>{excerpt}</Text>
               </View>
             </View>
           </View>
-        );
-      })}
+        </View>
+      ))}
     </View>
   );
 }
