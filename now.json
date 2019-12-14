@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "name": "barboraxuexpo",
+  "build": {
+    "env": {
+      "DATO_API_TOKEN": "@dato"
+    }
+  },
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@now/next"
+    }
+  ]
+}
