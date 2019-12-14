@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "export": "npm run build && next export",
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",

@@ -84,7 +84,6 @@ const styles = StyleSheet.create({
 
 Page.getInitialProps = async ({ res }) => {
   const data = await query(indexQuery);
-  console.log('data', data);
   const etag = require('crypto')
     .createHash('md5')
     .update(JSON.stringify(data.data))
