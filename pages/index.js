@@ -1,28 +1,14 @@
 // @generated: @expo/next-adapter@2.0.0-beta.9
-import React, { useEffect } from 'react';
+import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { query } from '../src/data/datocms';
 import Head from 'next/head';
 import Link from 'next/link';
 import gql from 'graphql-tag';
-import { useFocus } from '../src/hooks/useFocus';
+import { useRevalidateOnFocus } from '../src/hooks/useRevalidateOnFocus';
+import initialProps from '../src/data/initialProps';
 
 export default function Page({ data, etag, meta = {} }) {
-  const focused = useFocus();
-  useEffect(() => {
-    if (focused) {
-      fetch(window.location, {
-        headers: {
-          pragma: 'no-cache',
-        },
-      }).then(res => {
-        if (res.ok && res.headers.get('x-version') !== etag) {
-          window.location.reload();
-        }
-      });
-    }
-  }, [focused]);
-
+  useRevalidateOnFocus(etag);
   return (
     <View style={styles.container}>
       <Head>
@@ -33,6 +19,9 @@ export default function Page({ data, etag, meta = {} }) {
       </Head>
 
       <Text style={styles.text}>Welcome to Expo + Next.js 👋</Text>
+      <Link href="/news">
+        <a>News</a>
+      </Link>
 
       {data.allWorks.map(({ id, title, slug, excerpt, coverImage }) => (
         <View key={id} style={styles.showcase_item}>
@@ -82,20 +71,7 @@ const styles = StyleSheet.create({
   },
 });
 
-Page.getInitialProps = async ({ res }) => {
-  const data = await query(indexQuery);
-  const etag = require('crypto')
-    .createHash('md5')
-    .update(JSON.stringify(data.data))
-    .digest('hex');
-
-  if (res) {
-    res.setHeader('Cache-Control', 's-maxage=1, stale-while-revalidate');
-    res.setHeader('X-version', etag);
-  }
-
-  return { ...data, etag };
-};
+Page.getInitialProps = async ({ res }) => await initialProps(res, indexQuery);
 
 const indexQuery = gql`
   query IndexQuery {

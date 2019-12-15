@@ -1,26 +1,13 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { query } from '../../src/data/datocms';
 import Slider from 'react-slick';
 import gql from 'graphql-tag';
-import { useFocus } from '../../src/hooks/useFocus';
 import Link from 'next/link';
+import { useRevalidateOnFocus } from '../../src/hooks/useRevalidateOnFocus';
+import initialProps from '../../src/data/initialProps';
 
-const Work = ({ work, etag }) => {
-  const focused = useFocus();
-  useEffect(() => {
-    if (focused) {
-      fetch(window.location, {
-        headers: {
-          pragma: 'no-cache',
-        },
-      }).then(res => {
-        if (res.ok && res.headers.get('x-version') !== etag) {
-          window.location.reload();
-        }
-      });
-    }
-  }, [focused]);
+const Work = ({ data: { work }, etag }) => {
+  useRevalidateOnFocus(etag);
   const { coverImage } = work;
   return (
     <View style={styles.sheet}>
@@ -73,23 +60,8 @@ const styles = StyleSheet.create({
 
 export default Work;
 
-Work.getInitialProps = async props => {
-  const { res, asPath } = props;
-  const slug = asPath.slice('/works/'.length);
-  const result = await query(workQuery, { slug });
-  const { data } = result;
-  const etag = require('crypto')
-    .createHash('md5')
-    .update(JSON.stringify(data))
-    .digest('hex');
-
-  if (res) {
-    res.setHeader('Cache-Control', 's-maxage=1, stale-while-revalidate');
-    res.setHeader('X-version', etag);
-  }
-
-  return { ...data, etag };
-};
+Work.getInitialProps = async ({ res, asPath }) =>
+  await initialProps(res, workQuery, { slug: asPath.slice('/works/'.length) });
 
 const workQuery = gql`
   query WorkQuery($slug: String!) {

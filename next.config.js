@@ -23,17 +23,12 @@ module.exports = withExpo({
     const {
       data: { allWorks },
     } = await query(allSlugs);
-
-    // combine the map of works pages with the landing page
     const pages = {
       '/': { page: '/' },
+      '/news': { page: '/news' },
     };
-
-    // transform the list of works into a map of pages with the pathname `/works/:slug`
-    allWorks.forEach(
-      ({ slug }) => (pages[`/works/${slug}`] = { page: '/works/[slug]' }),
-    );
-
+    const worksPage = { page: '/works/[slug]' };
+    allWorks.forEach(({ slug }) => (pages[`/works/${slug}`] = worksPage));
     return pages;
   },
 });
