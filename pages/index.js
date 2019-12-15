@@ -1,16 +1,25 @@
 // @generated: @expo/next-adapter@2.0.0-beta.9
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 import Head from 'next/head';
 import Link from 'next/link';
 import gql from 'graphql-tag';
-import { useRevalidateOnFocus } from '../src/hooks/useRevalidateOnFocus';
+import { Text } from 'react-native';
+import styled from 'styled-components/native';
+
+import useRevalidateOnFocus from '../src/hooks/useRevalidateOnFocus';
+import { Container, Title } from '../src/presentational';
 import initialProps from '../src/data/initialProps';
+
+export const Showcase = styled.View``;
+export const Card = styled.View``;
+export const CardCaption = styled.View``;
+export const CardDescription = styled.Text``;
+export const CardTitle = styled.Text``;
 
 export default function Page({ data, etag, meta = {} }) {
   useRevalidateOnFocus(etag);
   return (
-    <View style={styles.container}>
+    <Container>
       <Head>
         {meta.title && <title>{meta.title[0][0]}</title>}
         {meta.description && (
@@ -18,14 +27,19 @@ export default function Page({ data, etag, meta = {} }) {
         )}
       </Head>
 
-      <Text style={styles.text}>Welcome to Expo + Next.js 👋</Text>
+      <Title>
+        Welcome to Expo + Next.js{' '}
+        <span role="img" aria-label="Greeting hand">
+          👋
+        </span>
+      </Title>
       <Link href="/news">
         <a>News</a>
       </Link>
 
       {data.allWorks.map(({ id, title, slug, excerpt, coverImage }) => (
-        <View key={id} style={styles.showcase_item}>
-          <View style={styles.card}>
+        <Showcase key={id}>
+          <Card>
             <Link href="/works/[slug]" as={`/works/${slug}`}>
               <a>
                 <img
@@ -36,42 +50,22 @@ export default function Page({ data, etag, meta = {} }) {
                 />
               </a>
             </Link>
-            <View style={styles.card_caption}>
-              <Text style={styles.card_title}>
+            <CardCaption>
+              <CardTitle>
                 <Link href="/works/[slug]" as={`/works/${slug}`}>
                   <a>{title}</a>
                 </Link>
-              </Text>
-              <View style={styles.card_description}>
+              </CardTitle>
+              <CardDescription>
                 <Text>{excerpt}</Text>
-              </View>
-            </View>
-          </View>
-        </View>
+              </CardDescription>
+            </CardCaption>
+          </Card>
+        </Showcase>
       ))}
-    </View>
+    </Container>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  showcase_item: {},
-  card: {},
-  card_caption: {},
-  card_description: {},
-  card_title: {
-    fontSize: 16,
-  },
-  text: {
-    fontSize: 16,
-  },
-});
-
-Page.getInitialProps = async ({ res }) => await initialProps(res, indexQuery);
 
 const indexQuery = gql`
   query IndexQuery {
@@ -90,3 +84,5 @@ const indexQuery = gql`
     }
   }
 `;
+
+Page.getInitialProps = ({ res }) => initialProps(res, indexQuery);

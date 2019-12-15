@@ -1,35 +1,48 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import Slider from 'react-slick';
-import gql from 'graphql-tag';
 import Link from 'next/link';
-import { useRevalidateOnFocus } from '../../src/hooks/useRevalidateOnFocus';
+import gql from 'graphql-tag';
+import Slider from 'react-slick';
+import styled from 'styled-components/native';
+
+import useRevalidateOnFocus from '../../src/hooks/useRevalidateOnFocus';
 import initialProps from '../../src/data/initialProps';
+import { Container } from '../../src/presentational';
+
+function WorkImageSlider({ work }) {
+  return (
+    <Slider infinite slidesToShow={2} arrows>
+      {work.gallery.map(coverImage => (
+        <img
+          width={450}
+          key={coverImage.url}
+          src={coverImage.url}
+          alt={coverImage.alt}
+          style={{ maxWidth: '100%' }}
+        />
+      ))}
+    </Slider>
+  );
+}
+
+export const Sheet = styled.View``;
+export const SheetSlider = styled.View``;
+export const SheetTitle = styled.Text``;
+export const SheetLead = styled.Text``;
 
 const Work = ({ data: { work }, etag }) => {
   useRevalidateOnFocus(etag);
   const { coverImage } = work;
   return (
-    <View style={styles.sheet}>
-      <View style={styles.sheet_inner}>
+    <Container>
+      <Sheet>
         <Link href="/">
           <a>Home</a>
         </Link>
-        <Text style={styles.sheet_title}>{work.title}</Text>
-        <Text style={styles.sheet_lead}>{work.excerpt}</Text>
-        <View style={styles.sheet_slider}>
-          <Slider infinite={true} slidesToShow={2} arrows>
-            {work.gallery.map(coverImage => (
-              <img
-                width={450}
-                key={coverImage.url}
-                src={coverImage.url}
-                alt={coverImage.alt}
-                style={{ maxWidth: '100%' }}
-              />
-            ))}
-          </Slider>
-        </View>
+        <SheetTitle>{work.title}</SheetTitle>
+        <SheetLead>{work.excerpt}</SheetLead>
+        <SheetSlider>
+          <WorkImageSlider work={work} />
+        </SheetSlider>
         <div
           dangerouslySetInnerHTML={{
             __html: work.description,
@@ -41,27 +54,12 @@ const Work = ({ data: { work }, etag }) => {
           alt={coverImage.alt}
           style={{ maxWidth: '100%' }}
         />
-      </View>
-    </View>
+      </Sheet>
+    </Container>
   );
 };
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  sheet_inner: {},
-  sheet_title: {},
-  sheet_lead: {},
-  sheet_slider: {},
-  sheet_gallery: {},
-});
 
 export default Work;
-
-Work.getInitialProps = async ({ res, asPath }) =>
-  await initialProps(res, workQuery, { slug: asPath.slice('/works/'.length) });
 
 const workQuery = gql`
   query WorkQuery($slug: String!) {
@@ -102,3 +100,6 @@ const workQuery = gql`
     }
   }
 `;
+
+Work.getInitialProps = ({ res, asPath }) =>
+  initialProps(res, workQuery, { slug: asPath.slice('/works/'.length) });

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
-import { useFocus } from './useFocus';
+import useFocus from './useFocus';
 
-export function useRevalidateOnFocus(etag) {
+export default function useRevalidateOnFocus(etag) {
   const focused = useFocus();
   useEffect(() => {
     if (focused) {

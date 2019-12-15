@@ -14,7 +14,9 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "eject": "expo eject",
-    "format": "prettier --write ./{src,pages}/**/*.{js,ts,json} ./*.{js,json}"
+    "lint": "eslint ./{src,pages}/ ./*.js --ext .js",
+    "fix": "eslint --fix ./{.,src,pages}/ --ext .js",
+    "format": "prettier --write ./{src,pages}/**/*.js ./*.{js,json}"
   },
   "dependencies": {
     "@expo/next-adapter": "^2.0.0-beta.9",
@@ -28,16 +30,24 @@
     "graphql-tag": "^2.10.1",
     "isomorphic-unfetch": "^3.0.0",
     "next": "^9.1.5",
-    "prettier": "^1.19.1",
+    "next-transpile-modules": "^2.3.1",
     "react": "~16.9.0",
     "react-dom": "~16.9.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-36.0.0.tar.gz",
     "react-native-web": "~0.11.7",
     "react-slick": "^0.25.2",
-    "resize-observer-polyfill": "^1.5.1"
+    "resize-observer-polyfill": "^1.5.1",
+    "styled-components": "^4.4.1"
   },
   "devDependencies": {
-    "babel-preset-expo": "~8.0.0"
+    "babel-eslint": "^10.0.3",
+    "babel-preset-expo": "~8.0.0",
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb": "^18.0.1",
+    "eslint-plugin-import": "^2.19.1",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-react": "^7.14.3",
+    "prettier": "^1.19.1"
   },
   "private": true
 }

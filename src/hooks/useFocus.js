@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-export const useFocus = () => {
+export default () => {
   const [state, setState] = useState(null);
   const onFocusEvent = () => {
     setState(true);
