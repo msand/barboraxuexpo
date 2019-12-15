@@ -24,7 +24,6 @@ function WorkImageSlider({ work }) {
 }
 
 export const Sheet = styled.View``;
-export const SheetSlider = styled.View``;
 export const SheetTitle = styled.Text``;
 export const SheetLead = styled.Text``;
 
@@ -38,9 +37,9 @@ export const Page = ({ data: { work }, etag }) => {
       <Sheet>
         <SheetTitle>{work.title}</SheetTitle>
         <SheetLead>{work.excerpt}</SheetLead>
-        <SheetSlider>
+        {work.gallery && work.gallery.length ? (
           <WorkImageSlider work={work} />
-        </SheetSlider>
+        ) : null}
         <Markdown>{work.description}</Markdown>
         <Image alt={alt} source={{ uri: url }} style={{ width, height }} />
       </Sheet>
@@ -60,7 +59,7 @@ export const InitialQuery = gql`
         width
         height
       }
-      description(markdown: true)
+      description(markdown: false)
       coverImage {
         alt
         id

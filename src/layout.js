@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import gql from 'graphql-tag';
 import { Helmet } from 'react-helmet';
-import { Platform } from 'react-native';
+import { Platform, ScrollView } from 'react-native';
 import styled from 'styled-components/native';
 import { useQuery } from '@apollo/react-hooks';
 
@@ -56,6 +56,7 @@ export const Row = styled.View`
   flex: 1;
 `;
 export const Main = styled.ScrollView`
+  margin: 5px;
   flex: 1;
 `;
 export const Sidebar = styled.View`
@@ -97,34 +98,38 @@ export default function Layout({ children }) {
 
   return (
     <Row>
+      {isWeb ? <Helmet favicon={faviconMetaTags} seo={_seoMetaTags} /> : null}
       <Sidebar open={sidebarOpen}>
-        {isWeb ? <Helmet favicon={faviconMetaTags} seo={_seoMetaTags} /> : null}
-        <SidebarTitle>
-          <Link href="/">
-            <Text>{siteName}</Text>
-          </Link>
-        </SidebarTitle>
-        <Markdown>{introText}</Markdown>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <Link href="/">
-              <Text>Home</Text>
-            </Link>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <Link href="/about">
-              <Text>About</Text>
-            </Link>
-          </SidebarMenuItem>
-        </SidebarMenu>
-        <SidebarSocial>
-          {allSocialProfiles.map(({ profileType, url }) => (
-            <Link key={profileType} href={url} target="blank">
-              <SocialByProfile profile={profileType.toLowerCase()} />
-            </Link>
-          ))}
-        </SidebarSocial>
-        <SidebarCopyright>{copyright}</SidebarCopyright>
+        {sidebarOpen ? (
+          <ScrollView style={{ marginVertical: 50, marginHorizontal: 10 }}>
+            <SidebarTitle>
+              <Link href="/">
+                <Text>{siteName}</Text>
+              </Link>
+            </SidebarTitle>
+            <Markdown>{introText}</Markdown>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <Link href="/">
+                  <Text>Home</Text>
+                </Link>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <Link href="/about">
+                  <Text>About</Text>
+                </Link>
+              </SidebarMenuItem>
+            </SidebarMenu>
+            <SidebarSocial>
+              {allSocialProfiles.map(({ profileType, url }) => (
+                <Link key={profileType} href={url} target="blank">
+                  <SocialByProfile profile={profileType.toLowerCase()} />
+                </Link>
+              ))}
+            </SidebarSocial>
+            <SidebarCopyright>{copyright}</SidebarCopyright>
+          </ScrollView>
+        ) : null}
       </Sidebar>
       <Main>
         <MobileHeader>

@@ -22,9 +22,14 @@ export const Image = styled.Image`
   max-height: 300px;
   max-width: 300px;
 `;
-export const ScrollView = styled.ScrollView``;
+export const StyledScrollView = styled.ScrollView`
+  padding: 5px;
+`;
 
 const styles = StyleSheet.create({
+  scrollContent: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     marginTop: 40,
@@ -32,6 +37,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
 });
+
+export const ScrollView = ({ style, children, contentContainerStyle }) => (
+  <StyledScrollView
+    style={style}
+    contentContainerStyle={
+      contentContainerStyle
+        ? StyleSheet.compose(styles.scrollContent, contentContainerStyle)
+        : styles.scrollContent
+    }
+  >
+    {children}
+  </StyledScrollView>
+);
 
 export function ErrorView({ children }) {
   return (
