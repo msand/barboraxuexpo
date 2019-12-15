@@ -1,33 +1,31 @@
 import React from 'react';
-import Head from 'next/head';
-import Link from 'next/link';
 import gql from 'graphql-tag';
-import { Text, View } from 'react-native';
 
 import useRevalidateOnFocus from '../src/hooks/useRevalidateOnFocus';
-import { Container, DateText, Title } from '../src/presentational';
+import { DateText, Title, Text, View, Image } from '../src/presentational';
 import initialProps from '../src/data/initialProps';
+import Markdown from '../src/markdown';
+import Layout from '../src/layout';
+import Head from '../src/Head';
+import Link from '../src/Link';
 
-export default function NewsPage({ data, etag, meta = {} }) {
+export function Page({ data, etag, meta = {} }) {
   useRevalidateOnFocus(etag);
   const {
     newsPage: { title, updatedAt, newsContent },
   } = data;
   return (
-    <Container>
+    <Layout>
       <Head>
         {meta.title && <title>{meta.title[0][0]}</title>}
         {meta.description && (
           <meta name="description" content={meta.description[0][0]} />
         )}
       </Head>
-      <Link href="/">
-        <a>Home</a>
-      </Link>
       <Title>{title}</Title>
       <DateText>{updatedAt}</DateText>
       <NewsContent newsContent={newsContent} />
-    </Container>
+    </Layout>
   );
 }
 function NewsContent({ newsContent }) {
@@ -41,13 +39,7 @@ function NewsContent({ newsContent }) {
             long: {where.longitude} lat: {where.latitude}
           </Text>
         ) : null}
-        {content ? (
-          <div
-            dangerouslySetInnerHTML={{
-              __html: content,
-            }}
-          />
-        ) : null}
+        {content ? <Markdown>{content}</Markdown> : null}
         {image ? <NewsImage image={image} /> : null}
         {gallery ? <NewsGallery gallery={gallery} /> : null}
         {video ? <NewsVideo video={video} /> : null}
@@ -56,25 +48,36 @@ function NewsContent({ newsContent }) {
   );
 }
 function NewsImage({ image: { url, alt, width, height } }) {
-  return <img src={url} alt={alt} width={width} height={height} />;
+  return <Image alt={alt} source={{ uri: url }} style={{ width, height }} />;
 }
 function NewsVideo({
   video: { url, title, thumbnailUrl, alt, width, height },
 }) {
   return (
-    <a href={url} title={title}>
-      {title}
-      <img src={thumbnailUrl} alt={alt} width={width} height={height} />
-    </a>
+    <Link href={url} title={title}>
+      <View>
+        <Text>{title}</Text>
+        <Image
+          alt={alt}
+          style={{ width, height }}
+          source={{ uri: thumbnailUrl }}
+        />
+      </View>
+    </Link>
   );
 }
 function NewsGallery({ gallery }) {
   return gallery.map(({ url, alt, width, height }) => (
-    <img src={url} key={url} alt={alt} width={width} height={height} />
+    <Image
+      key={url}
+      alt={alt}
+      source={{ uri: url }}
+      style={{ width, height }}
+    />
   ));
 }
 
-const newsPageQuery = gql`
+export const InitialQuery = gql`
   query NewsPageQuery {
     newsPage {
       title
@@ -108,7 +111,7 @@ const newsPageQuery = gql`
         title
         id
         updatedAt
-        content(markdown: true)
+        content(markdown: false)
       }
       _seoMetaTags {
         tag
@@ -120,4 +123,6 @@ const newsPageQuery = gql`
   }
 `;
 
-NewsPage.getInitialProps = ({ res }) => initialProps(res, newsPageQuery);
+Page.getInitialProps = ({ res }) => initialProps(res, InitialQuery);
+
+export default Page;

@@ -1,14 +1,14 @@
 // @generated: @expo/next-adapter@2.0.0-beta.9
 import React from 'react';
-import Head from 'next/head';
-import Link from 'next/link';
 import gql from 'graphql-tag';
-import { Text } from 'react-native';
 import styled from 'styled-components/native';
 
 import useRevalidateOnFocus from '../src/hooks/useRevalidateOnFocus';
-import { Container, Title } from '../src/presentational';
+import { Container, Title, Image, Text } from '../src/presentational';
 import initialProps from '../src/data/initialProps';
+import Layout from '../src/layout';
+import Link from '../src/Link';
+import Head from '../src/Head';
 
 export const Showcase = styled.View``;
 export const Card = styled.View``;
@@ -16,58 +16,58 @@ export const CardCaption = styled.View``;
 export const CardDescription = styled.Text``;
 export const CardTitle = styled.Text``;
 
-export default function Page({ data, etag, meta = {} }) {
+export function Page({ data, etag, meta = {} }) {
   useRevalidateOnFocus(etag);
   return (
-    <Container>
-      <Head>
-        {meta.title && <title>{meta.title[0][0]}</title>}
-        {meta.description && (
-          <meta name="description" content={meta.description[0][0]} />
-        )}
-      </Head>
+    <Layout>
+      <Container>
+        <Head>
+          {meta.title && <title>{meta.title[0][0]}</title>}
+          {meta.description && (
+            <meta name="description" content={meta.description[0][0]} />
+          )}
+        </Head>
 
-      <Title>
-        Welcome to Expo + Next.js{' '}
-        <span role="img" aria-label="Greeting hand">
-          👋
-        </span>
-      </Title>
-      <Link href="/news">
-        <a>News</a>
-      </Link>
+        <Title>
+          Welcome to Expo + Next.js{' '}
+          <Text role="img" aria-label="Greeting hand">
+            👋
+          </Text>
+        </Title>
+        <Link href="/news">
+          <Text>News</Text>
+        </Link>
 
-      {data.allWorks.map(({ id, title, slug, excerpt, coverImage }) => (
-        <Showcase key={id}>
-          <Card>
-            <Link href="/works/[slug]" as={`/works/${slug}`}>
-              <a>
-                <img
-                  width={450}
-                  style={{ maxWidth: '100%' }}
-                  src={coverImage.url}
+        {data.allWorks.map(({ id, title, slug, excerpt, coverImage }) => (
+          <Showcase key={id}>
+            <Card>
+              <Link
+                href="/works/[slug]"
+                as={`/works/${slug}`}
+                variables={{ slug }}
+              >
+                <Image
                   alt={coverImage.alt}
+                  style={{ width: 50, height: 50 }}
+                  source={{ uri: coverImage.url }}
                 />
-              </a>
-            </Link>
-            <CardCaption>
-              <CardTitle>
-                <Link href="/works/[slug]" as={`/works/${slug}`}>
-                  <a>{title}</a>
+              </Link>
+              <CardCaption>
+                <Link href="/works/[slug]" as={`/works/${slug}`} variables={{ slug }}>
+                  <CardTitle>{title}</CardTitle>
                 </Link>
-              </CardTitle>
-              <CardDescription>
-                <Text>{excerpt}</Text>
-              </CardDescription>
-            </CardCaption>
-          </Card>
-        </Showcase>
-      ))}
-    </Container>
+                <CardDescription>
+                  <Text>{excerpt}</Text>
+                </CardDescription>
+              </CardCaption>
+            </Card>
+          </Showcase>
+        ))}
+      </Container>
+    </Layout>
   );
 }
-
-const indexQuery = gql`
+export const InitialQuery = gql`
   query IndexQuery {
     allWorks(orderBy: position_ASC) {
       id
@@ -85,4 +85,5 @@ const indexQuery = gql`
   }
 `;
 
-Page.getInitialProps = ({ res }) => initialProps(res, indexQuery);
+Page.getInitialProps = ({ res }) => initialProps(res, InitialQuery);
+export default Page;

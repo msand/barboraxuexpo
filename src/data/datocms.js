@@ -4,7 +4,7 @@ const { setContext } = require('apollo-link-context');
 const { InMemoryCache } = require('apollo-cache-inmemory');
 const fetch = require('isomorphic-unfetch');
 
-const token = process.env.DATO_API_TOKEN;
+const token = process.env.DATO_API_TOKEN || 'de342103fca06a961c637edd39bcf8';
 
 const httpLink = createHttpLink({
   fetch,
@@ -25,5 +25,6 @@ const client = new ApolloClient({
 });
 
 module.exports = {
+  client,
   query: (query, variables) => client.query({ query, variables }),
 };
