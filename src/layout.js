@@ -80,10 +80,18 @@ export default function Layout({ children }) {
 
   const { loading, error, data } = useQuery(layoutQuery, { client });
   if (loading) {
-    return <ErrorView>Loading...</ErrorView>;
+    return (
+      <ErrorView>
+        <Text>Loading...</Text>
+      </ErrorView>
+    );
   }
   if (error) {
-    return <ErrorView>Error! {error.message}</ErrorView>;
+    return (
+      <ErrorView>
+        <Text>Error! {error.message}</Text>
+      </ErrorView>
+    );
   }
 
   const {

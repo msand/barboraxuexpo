@@ -3,36 +3,40 @@ import { useQuery } from '@apollo/react-hooks';
 
 import * as news from './pages/news';
 import * as index from './pages/index';
+import * as about from './pages/about';
 import { client } from './src/data/datocms';
 import * as works from './pages/works/[slug]';
-import { ErrorView } from './src/presentational';
+import { ErrorView, Text } from './src/presentational';
 import { defaultRouteState, RouteContext } from './src/Link';
 
-function getRoute(page) {
-  switch (page) {
-    case '/news':
-      return news;
-    case '/works/':
-      return works;
-    default:
-    case '/':
-      return index;
-  }
-}
+const routes = {
+  '/news': news,
+  '/works/': works,
+  '/about': about,
+  '/': index,
+};
 
 export default function App() {
   const [routeState, setRouteState] = useState(defaultRouteState);
   const { page, variables } = routeState;
-  const { InitialQuery, Page } = getRoute(page);
+  const { InitialQuery, Page } = routes[page] || index;
   const { loading, error, data } = useQuery(InitialQuery, {
     client,
     variables,
   });
   if (loading) {
-    return <ErrorView>Loading...</ErrorView>;
+    return (
+      <ErrorView>
+        <Text>Loading...</Text>
+      </ErrorView>
+    );
   }
   if (error) {
-    return <ErrorView>Error! {error.message}</ErrorView>;
+    return (
+      <ErrorView>
+        <Text>Error! {error.message}</Text>
+      </ErrorView>
+    );
   }
   return (
     <RouteContext.Provider value={{ routeState, setRouteState }}>

@@ -58,3 +58,7 @@ export function ErrorView({ children }) {
     </View>
   );
 }
+
+export function DatoImage({ image: { url, alt, width, height } }) {
+  return <Image alt={alt} source={{ uri: url }} style={{ width, height }} />;
+}

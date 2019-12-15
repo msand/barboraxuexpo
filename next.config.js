@@ -30,6 +30,7 @@ module.exports = withExpo(
       const pages = {
         '/': { page: '/' },
         '/news': { page: '/news' },
+        '/about': { page: '/about' },
       };
       const worksPage = { page: '/works/[slug]' };
       allWorks.forEach(({ slug }) => {

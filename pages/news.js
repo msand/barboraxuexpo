@@ -2,7 +2,7 @@ import React from 'react';
 import gql from 'graphql-tag';
 
 import useRevalidateOnFocus from '../src/hooks/useRevalidateOnFocus';
-import { DateText, Title, Text, View, Image } from '../src/presentational';
+import { DateText, DatoImage, Image, Text, Title, View } from '../src/presentational';
 import initialProps from '../src/data/initialProps';
 import Markdown from '../src/markdown';
 import Layout from '../src/layout';
@@ -40,15 +40,12 @@ function NewsContent({ newsContent }) {
           </Text>
         ) : null}
         {content ? <Markdown>{content}</Markdown> : null}
-        {image ? <NewsImage image={image} /> : null}
+        {image ? <DatoImage image={image} /> : null}
         {gallery ? <NewsGallery gallery={gallery} /> : null}
         {video ? <NewsVideo video={video} /> : null}
       </View>
     ),
   );
-}
-function NewsImage({ image: { url, alt, width, height } }) {
-  return <Image alt={alt} source={{ uri: url }} style={{ width, height }} />;
 }
 function NewsVideo({
   video: { url, title, thumbnailUrl, alt, width, height },
