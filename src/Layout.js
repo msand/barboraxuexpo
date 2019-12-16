@@ -7,13 +7,15 @@ import Link from './Link';
 import Markdown from './Markdown';
 import { client } from './data/datocms';
 import {
+  CenterText,
   Container,
   ErrorView,
   Main,
+  mainStyles,
   MobileHeader,
   MobileHeaderLogo,
   MobileHeaderMenu,
-  Row,
+  Root,
   Sidebar,
   SidebarButton,
   SidebarCopyright,
@@ -95,21 +97,20 @@ function Layout({ children }) {
   const { copyright, introText } = home;
 
   return (
-    <Row>
+    <Root>
       <Seo favicon={faviconMetaTags} seo={_seoMetaTags} />
       <Sidebar open={sidebarOpen}>
         {sidebarOpen ? (
           <SidebarScrollView>
-            <SidebarTitle>
-              <Link href="/">
-                <Text>{siteName}</Text>
-              </Link>
-            </SidebarTitle>
-            <Markdown>{introText}</Markdown>
             <SidebarMenu>
               <SidebarMenuItem>
                 <Link href="/">
                   <Text>Home</Text>
+                </Link>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <Link href="/news">
+                  <Text>News</Text>
                 </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
@@ -118,9 +119,15 @@ function Layout({ children }) {
                 </Link>
               </SidebarMenuItem>
             </SidebarMenu>
+            <SidebarTitle>
+              <Link href="/">
+                <Text>{siteName}</Text>
+              </Link>
+            </SidebarTitle>
+            <Markdown>{introText}</Markdown>
             <SidebarSocial>
               {allSocialProfiles.map(({ profileType, url }) => (
-                <Link key={profileType} href={url} target="blank">
+                <Link key={profileType} href={url}>
                   <SocialByProfile profile={profileType.toLowerCase()} />
                 </Link>
               ))}
@@ -129,23 +136,23 @@ function Layout({ children }) {
           </SidebarScrollView>
         ) : null}
       </Sidebar>
-      <Main>
+      <Main contentContainerStyle={mainStyles.scrollContent}>
         <MobileHeader>
-          <MobileHeaderMenu>
-            <SidebarButton
-              onPress={() => setSidebarOpen(!sidebarOpen)}
-              title="Menu"
-            />
-          </MobileHeaderMenu>
           <MobileHeaderLogo>
             <Link href="/">
-              <Text>{siteName}</Text>
+              <CenterText>{siteName}</CenterText>
             </Link>
           </MobileHeaderLogo>
         </MobileHeader>
         <Container>{children}</Container>
       </Main>
-    </Row>
+      <MobileHeaderMenu>
+        <SidebarButton
+          onPress={() => setSidebarOpen(!sidebarOpen)}
+          title="Menu"
+        />
+      </MobileHeaderMenu>
+    </Root>
   );
 }
 

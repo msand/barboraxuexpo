@@ -1,9 +1,9 @@
 import React from 'react';
-import { TouchableOpacity } from 'react-native';
 import NextLink from 'next/link';
+import { TouchableOpacity } from 'react-native';
 
-const Link = ({ href, target, as, title, children }) => (
-  <NextLink href={href} target={target} as={as} title={title}>
+const Link = ({ href, as, children }) => (
+  <NextLink href={href} as={as}>
     <TouchableOpacity>{children}</TouchableOpacity>
   </NextLink>
 );

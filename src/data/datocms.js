@@ -1,8 +1,8 @@
-const { ApolloClient } = require('apollo-client');
-const { createHttpLink } = require('apollo-link-http');
-const { setContext } = require('apollo-link-context');
-const { InMemoryCache } = require('apollo-cache-inmemory');
 const fetch = require('isomorphic-unfetch');
+const { ApolloClient } = require('apollo-client');
+const { setContext } = require('apollo-link-context');
+const { createHttpLink } = require('apollo-link-http');
+const { InMemoryCache } = require('apollo-cache-inmemory');
 
 const token = process.env.DATO_API_TOKEN || 'de342103fca06a961c637edd39bcf8';
 

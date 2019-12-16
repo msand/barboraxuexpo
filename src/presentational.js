@@ -7,31 +7,56 @@ export const Container = styled.View`
   flex: 1;
 `;
 export const View = styled.View``;
+export const AbsoluteFill = styled.View`
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+`;
 
-export const Title = styled.Text`
+export const Text = styled.Text`
+  font-size: 16px;
+  color: #fff;
+`;
+export const Title = styled(Text)`
   font-size: 20px;
   flex: 1;
 `;
-export const Text = styled.Text`
-  font-size: 16px;
+export const CenterText = styled(Text)`
+  text-align: center;
 `;
-export const DateText = styled.Text`
+export const DateText = styled(Text)`
   font-size: 14px;
 `;
 export const Image = styled.Image`
+  resizeMode: contain;
   max-height: 300px;
-  max-width: 300px;
+  max-width: 100%;
+`;
+export const FlexImage = styled(Image)`
+  resizeMode: contain;
+  min-height: 300px;
+  width: 100%;
+  flex: 1;
 `;
 export const StyledScrollView = styled.ScrollView`
   padding: 5px;
 `;
 
+export const Spacer = styled.View`
+  height: ${props => props.h || '1px'};
+  width: ${props => props.w || '1px'};
+`;
 export const Row = styled.View`
   flex-direction: row;
   flex: 1;
 `;
+export const Root = styled(Row)`
+  background: #000;
+`;
 export const Main = styled.ScrollView`
-  margin: 5px;
+  padding: 5px;
   flex: 1;
 `;
 export const Sidebar = styled.View`
@@ -43,26 +68,32 @@ export const SidebarScrollView = styled.ScrollView`
   margin-vertical: 50;
 `;
 export const SidebarButton = styled.Button``;
-export const SidebarTitle = styled.Text``;
+export const SidebarTitle = styled(Text)``;
 export const SidebarMenu = styled.View``;
-export const SidebarMenuItem = styled.View``;
+export const SidebarMenuItem = styled.View`
+  margin-bottom: 20px;
+`;
 export const SidebarSocial = styled.View``;
-export const SidebarCopyright = styled.Text``;
+export const SidebarCopyright = styled(Text)``;
 export const Social = styled.View``;
 export const MobileHeader = styled.View``;
-export const MobileHeaderMenu = styled.View``;
+export const MobileHeaderMenu = styled.View`
+  position: absolute;
+  left: 0;
+`;
 export const MobileHeaderLogo = styled.View``;
 export const SocialByProfile = () => <Social />;
 
-const styles = StyleSheet.create({
+export const mainStyles = StyleSheet.create({
   scrollContent: {
-    flex: 1,
+    marginBottom: 40,
+    paddingBottom: 40,
   },
   container: {
     flex: 1,
     marginTop: 40,
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#000',
   },
 });
 
@@ -71,8 +102,8 @@ export const ScrollView = ({ style, children, contentContainerStyle }) => (
     style={style}
     contentContainerStyle={
       contentContainerStyle
-        ? StyleSheet.compose(styles.scrollContent, contentContainerStyle)
-        : styles.scrollContent
+        ? StyleSheet.compose(mainStyles.scrollContent, contentContainerStyle)
+        : mainStyles.scrollContent
     }
   >
     {children}
@@ -81,12 +112,15 @@ export const ScrollView = ({ style, children, contentContainerStyle }) => (
 
 export function ErrorView({ children }) {
   return (
-    <View style={styles.container}>
+    <View style={mainStyles.container}>
       {typeof children === 'string' ? <Text>{children}</Text> : children}
     </View>
   );
 }
 
-export function DatoImage({ image: { url, alt, width, height } }) {
-  return <Image alt={alt} source={{ uri: url }} style={{ width, height }} />;
+export function DatoImage({ image: { url, alt, width, height }, style }) {
+  const dim = { width, height };
+  return (
+    <Image alt={alt} source={{ uri: url }} style={style ? [dim, style] : dim} />
+  );
 }

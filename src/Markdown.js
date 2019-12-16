@@ -1,7 +1,9 @@
 import React from 'react';
-import styledWeb from 'styled-components';
+import styled from 'styled-components';
 
-const Markdown = styledWeb.div``;
+const Markdown = styled.div`
+  color: #fff;
+`;
 
 export default ({ children }) => (
   <Markdown
