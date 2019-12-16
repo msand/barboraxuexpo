@@ -1,16 +1,30 @@
 import React, { useState } from 'react';
-import gql from 'graphql-tag';
-import { Helmet } from 'react-helmet';
-import { Platform, ScrollView } from 'react-native';
-import styled from 'styled-components/native';
 import { useQuery } from '@apollo/react-hooks';
+import gql from 'graphql-tag';
 
+import Seo from './Seo';
 import Link from './Link';
-import Markdown from './markdown';
+import Markdown from './Markdown';
 import { client } from './data/datocms';
-import { Container, ErrorView, Text } from './presentational';
-
-const isWeb = Platform.OS === 'web';
+import {
+  Container,
+  ErrorView,
+  Main,
+  MobileHeader,
+  MobileHeaderLogo,
+  MobileHeaderMenu,
+  Row,
+  Sidebar,
+  SidebarButton,
+  SidebarCopyright,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarScrollView,
+  SidebarSocial,
+  SidebarTitle,
+  SocialByProfile,
+  Text,
+} from './presentational';
 
 const layoutQuery = gql`
   query LayoutQuery {
@@ -51,31 +65,7 @@ const layoutQuery = gql`
   }
 `;
 
-export const Row = styled.View`
-  flex-direction: row;
-  flex: 1;
-`;
-export const Main = styled.ScrollView`
-  margin: 5px;
-  flex: 1;
-`;
-export const Sidebar = styled.View`
-  flex: 1;
-  display: ${props => (props.open ? 'flex' : 'none')};
-`;
-export const SidebarButton = styled.Button``;
-export const SidebarTitle = styled.Text``;
-export const SidebarMenu = styled.View``;
-export const SidebarMenuItem = styled.View``;
-export const SidebarSocial = styled.View``;
-export const SidebarCopyright = styled.Text``;
-export const Social = styled.View``;
-export const MobileHeader = styled.View``;
-export const MobileHeaderMenu = styled.View``;
-export const MobileHeaderLogo = styled.View``;
-export const SocialByProfile = () => <Social />;
-
-export default function Layout({ children }) {
+function Layout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const { loading, error, data } = useQuery(layoutQuery, { client });
@@ -106,10 +96,10 @@ export default function Layout({ children }) {
 
   return (
     <Row>
-      {isWeb ? <Helmet favicon={faviconMetaTags} seo={_seoMetaTags} /> : null}
+      <Seo favicon={faviconMetaTags} seo={_seoMetaTags} />
       <Sidebar open={sidebarOpen}>
         {sidebarOpen ? (
-          <ScrollView style={{ marginVertical: 50, marginHorizontal: 10 }}>
+          <SidebarScrollView>
             <SidebarTitle>
               <Link href="/">
                 <Text>{siteName}</Text>
@@ -136,7 +126,7 @@ export default function Layout({ children }) {
               ))}
             </SidebarSocial>
             <SidebarCopyright>{copyright}</SidebarCopyright>
-          </ScrollView>
+          </SidebarScrollView>
         ) : null}
       </Sidebar>
       <Main>
@@ -158,3 +148,5 @@ export default function Layout({ children }) {
     </Row>
   );
 }
+
+export default Layout;

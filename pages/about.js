@@ -5,12 +5,17 @@ import gql from 'graphql-tag';
 import useRevalidateOnFocus from '../src/hooks/useRevalidateOnFocus';
 import { Container, Title, DatoImage, Text } from '../src/presentational';
 import initialProps from '../src/data/initialProps';
-import Layout from '../src/layout';
+import Layout from '../src/Layout';
 import Head from '../src/Head';
 
-export function Page({ data, etag, meta = {} }) {
+export function Page({
+  etag,
+  meta = {},
+  data: {
+    aboutPage: { bio, title, subtitle, photo },
+  },
+}) {
   useRevalidateOnFocus(etag);
-  const { bio, title, subtitle, photo } = data.aboutPage;
   return (
     <Layout>
       <Container>
@@ -20,7 +25,6 @@ export function Page({ data, etag, meta = {} }) {
             <meta name="description" content={meta.description[0][0]} />
           )}
         </Head>
-
         <Title>{title}</Title>
         <Title>{subtitle}</Title>
         <Text>{bio}</Text>
@@ -29,7 +33,7 @@ export function Page({ data, etag, meta = {} }) {
     </Layout>
   );
 }
-export const InitialQuery = gql`
+export const Query = gql`
   query AboutQuery {
     aboutPage {
       id
@@ -64,5 +68,6 @@ export const InitialQuery = gql`
   }
 `;
 
-Page.getInitialProps = ({ res }) => initialProps(res, InitialQuery);
+Page.getInitialProps = ({ res }) => initialProps(res, Query);
+
 export default Page;

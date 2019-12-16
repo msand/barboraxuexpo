@@ -6,28 +6,31 @@ import styled from 'styled-components/native';
 import useRevalidateOnFocus from '../src/hooks/useRevalidateOnFocus';
 import { Container, Title, Image, Text } from '../src/presentational';
 import initialProps from '../src/data/initialProps';
-import Layout from '../src/layout';
+import Layout from '../src/Layout';
 import Link from '../src/Link';
 import Head from '../src/Head';
 
 export const Showcase = styled.View``;
 export const Card = styled.View``;
+export const CardTitle = styled.Text``;
 export const CardCaption = styled.View``;
 export const CardDescription = styled.Text``;
-export const CardTitle = styled.Text``;
 
-export function Page({ data, etag, meta = {} }) {
+export function Page({
+  etag,
+  meta: { description, title: metaTitle } = {},
+  data: { allWorks },
+}) {
   useRevalidateOnFocus(etag);
   return (
     <Layout>
       <Container>
         <Head>
-          {meta.title && <title>{meta.title[0][0]}</title>}
-          {meta.description && (
-            <meta name="description" content={meta.description[0][0]} />
+          {metaTitle && <title>{metaTitle[0][0]}</title>}
+          {description && (
+            <meta name="description" content={description[0][0]} />
           )}
         </Head>
-
         <Title>
           Welcome to Expo + Next.js{' '}
           <Text role="img" aria-label="Greeting hand">
@@ -37,8 +40,7 @@ export function Page({ data, etag, meta = {} }) {
         <Link href="/news">
           <Text>News</Text>
         </Link>
-
-        {data.allWorks.map(({ id, title, slug, excerpt, coverImage }) => (
+        {allWorks.map(({ id, title, slug, excerpt, coverImage }) => (
           <Showcase key={id}>
             <Card>
               <Link
@@ -53,7 +55,11 @@ export function Page({ data, etag, meta = {} }) {
                 />
               </Link>
               <CardCaption>
-                <Link href="/works/[slug]" as={`/works/${slug}`} variables={{ slug }}>
+                <Link
+                  href="/works/[slug]"
+                  as={`/works/${slug}`}
+                  variables={{ slug }}
+                >
                   <CardTitle>{title}</CardTitle>
                 </Link>
                 <CardDescription>
@@ -67,7 +73,7 @@ export function Page({ data, etag, meta = {} }) {
     </Layout>
   );
 }
-export const InitialQuery = gql`
+export const Query = gql`
   query IndexQuery {
     allWorks(orderBy: position_ASC) {
       id
@@ -85,5 +91,6 @@ export const InitialQuery = gql`
   }
 `;
 
-Page.getInitialProps = ({ res }) => initialProps(res, InitialQuery);
+Page.getInitialProps = ({ res }) => initialProps(res, Query);
+
 export default Page;

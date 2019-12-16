@@ -26,6 +26,34 @@ export const StyledScrollView = styled.ScrollView`
   padding: 5px;
 `;
 
+export const Row = styled.View`
+  flex-direction: row;
+  flex: 1;
+`;
+export const Main = styled.ScrollView`
+  margin: 5px;
+  flex: 1;
+`;
+export const Sidebar = styled.View`
+  flex: 1;
+  display: ${props => (props.open ? 'flex' : 'none')};
+`;
+export const SidebarScrollView = styled.ScrollView`
+  margin-horizontal: 10;
+  margin-vertical: 50;
+`;
+export const SidebarButton = styled.Button``;
+export const SidebarTitle = styled.Text``;
+export const SidebarMenu = styled.View``;
+export const SidebarMenuItem = styled.View``;
+export const SidebarSocial = styled.View``;
+export const SidebarCopyright = styled.Text``;
+export const Social = styled.View``;
+export const MobileHeader = styled.View``;
+export const MobileHeaderMenu = styled.View``;
+export const MobileHeaderLogo = styled.View``;
+export const SocialByProfile = () => <Social />;
+
 const styles = StyleSheet.create({
   scrollContent: {
     flex: 1,

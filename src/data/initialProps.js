@@ -1,7 +1,7 @@
 import { query } from './datocms';
 
-export default async (res, initialQuery, variables) => {
-  const result = await query(initialQuery, variables);
+export default async (res, gqlQuery, variables) => {
+  const result = await query(gqlQuery, variables);
   const { data } = result;
   const etag = require('crypto')
     .createHash('md5')

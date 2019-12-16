@@ -2,25 +2,33 @@ import React from 'react';
 import gql from 'graphql-tag';
 
 import useRevalidateOnFocus from '../src/hooks/useRevalidateOnFocus';
-import { DateText, DatoImage, Image, Text, Title, View } from '../src/presentational';
+import {
+  DateText,
+  DatoImage,
+  Image,
+  Text,
+  Title,
+  View,
+} from '../src/presentational';
 import initialProps from '../src/data/initialProps';
-import Markdown from '../src/markdown';
-import Layout from '../src/layout';
+import Markdown from '../src/Markdown';
+import Layout from '../src/Layout';
 import Head from '../src/Head';
 import Link from '../src/Link';
 
-export function Page({ data, etag, meta = {} }) {
-  useRevalidateOnFocus(etag);
-  const {
+export function Page({
+  etag,
+  meta: { description, title: metaTitle } = {},
+  data: {
     newsPage: { title, updatedAt, newsContent },
-  } = data;
+  },
+}) {
+  useRevalidateOnFocus(etag);
   return (
     <Layout>
       <Head>
-        {meta.title && <title>{meta.title[0][0]}</title>}
-        {meta.description && (
-          <meta name="description" content={meta.description[0][0]} />
-        )}
+        {metaTitle && <title>{metaTitle[0][0]}</title>}
+        {description && <meta name="description" content={description[0][0]} />}
       </Head>
       <Title>{title}</Title>
       <DateText>{updatedAt}</DateText>
@@ -74,7 +82,7 @@ function NewsGallery({ gallery }) {
   ));
 }
 
-export const InitialQuery = gql`
+export const Query = gql`
   query NewsPageQuery {
     newsPage {
       title
@@ -120,6 +128,6 @@ export const InitialQuery = gql`
   }
 `;
 
-Page.getInitialProps = ({ res }) => initialProps(res, InitialQuery);
+Page.getInitialProps = ({ res }) => initialProps(res, Query);
 
 export default Page;

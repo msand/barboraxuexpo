@@ -5,13 +5,14 @@ import styled from 'styled-components/native';
 import useRevalidateOnFocus from '../../src/hooks/useRevalidateOnFocus';
 import { Image, ScrollView } from '../../src/presentational';
 import initialProps from '../../src/data/initialProps';
-import Markdown from '../../src/markdown';
-import Layout from '../../src/layout';
+import Markdown from '../../src/Markdown';
+import Layout from '../../src/Layout';
+import Head from '../../src/Head';
 
-function WorkImageSlider({ work }) {
+function WorkImageSlider({ gallery }) {
   return (
     <ScrollView>
-      {work.gallery.map(({ alt, url, width, height }) => (
+      {gallery.map(({ alt, url, width, height }) => (
         <Image
           key={url}
           alt={alt}
@@ -24,30 +25,45 @@ function WorkImageSlider({ work }) {
 }
 
 export const Sheet = styled.View``;
-export const SheetTitle = styled.Text``;
 export const SheetLead = styled.Text``;
+export const SheetTitle = styled.Text``;
 
-export const Page = ({ data: { work }, etag }) => {
+export const Page = ({
+  etag,
+  meta = {},
+  data: {
+    work: {
+      title,
+      excerpt,
+      gallery,
+      description,
+      coverImage: { alt, url, width, height },
+    },
+  },
+}) => {
   useRevalidateOnFocus(etag);
-  const {
-    coverImage: { alt, url, width, height },
-  } = work;
   return (
     <Layout>
+      <Head>
+        {meta.title && <title>{meta.title[0][0]}</title>}
+        {meta.description && (
+          <meta name="description" content={meta.description[0][0]} />
+        )}
+      </Head>
       <Sheet>
-        <SheetTitle>{work.title}</SheetTitle>
-        <SheetLead>{work.excerpt}</SheetLead>
-        {work.gallery && work.gallery.length ? (
-          <WorkImageSlider work={work} />
+        <SheetTitle>{title}</SheetTitle>
+        <SheetLead>{excerpt}</SheetLead>
+        {gallery && gallery.length ? (
+          <WorkImageSlider gallery={gallery} />
         ) : null}
-        <Markdown>{work.description}</Markdown>
+        <Markdown>{description}</Markdown>
         <Image alt={alt} source={{ uri: url }} style={{ width, height }} />
       </Sheet>
     </Layout>
   );
 };
 
-export const InitialQuery = gql`
+export const Query = gql`
   query WorkQuery($slug: String!) {
     work(orderBy: position_ASC, filter: { slug: { eq: $slug } }) {
       title
@@ -88,6 +104,6 @@ export const InitialQuery = gql`
 `;
 
 Page.getInitialProps = ({ res, asPath }) =>
-  initialProps(res, InitialQuery, { slug: asPath.slice('/works/'.length) });
+  initialProps(res, Query, { slug: asPath.slice('/works/'.length) });
 
 export default Page;
