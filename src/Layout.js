@@ -9,7 +9,7 @@ import { client } from './data/datocms';
 import {
   CenterText,
   Container,
-  ErrorView,
+  ErrorView, isWeb,
   Main,
   mainStyles,
   MobileHeader,
@@ -45,7 +45,7 @@ const layoutQuery = gql`
     }
     home {
       copyright
-      introText(markdown: false)
+      introText(markdown: ${isWeb})
       _seoMetaTags {
         tag
         content
