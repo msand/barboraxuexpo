@@ -3,7 +3,12 @@ import React from 'react';
 import gql from 'graphql-tag';
 
 import useRevalidateOnFocus from '../src/hooks/useRevalidateOnFocus';
-import { Container, Title, DatoImage, Text } from '../src/presentational';
+import {
+  Container,
+  Title,
+  DatoImage,
+  Text,
+} from '../src/presentational';
 import initialProps from '../src/data/initialProps';
 import Layout from '../src/Layout';
 import Head from '../src/Head';
@@ -22,14 +27,22 @@ export function Page({
         <Head>
           {meta.title && <title>{meta.title[0][0]}</title>}
           {meta.description && (
-            <meta name="description" content={meta.description[0][0]} />
+          <meta name="description" content={meta.description[0][0]} />
           )}
         </Head>
         <Title>{title}</Title>
         <Title>{subtitle}</Title>
         <Text>{bio}</Text>
-        {photo ? <DatoImage image={photo} /> : null}
       </Container>
+      {photo ? (
+        <DatoImage
+          image={photo}
+          style={{
+            height: 300,
+            padding: 10,
+          }}
+        />
+      ) : null}
     </Layout>
   );
 }

@@ -3,7 +3,7 @@ import gql from 'graphql-tag';
 import styled from 'styled-components/native';
 
 import useRevalidateOnFocus from '../../src/hooks/useRevalidateOnFocus';
-import { Image, ScrollView } from '../../src/presentational';
+import { Image, isWeb, ScrollView } from '../../src/presentational';
 import initialProps from '../../src/data/initialProps';
 import Markdown from '../../src/Markdown';
 import Layout from '../../src/Layout';
@@ -75,7 +75,7 @@ export const Query = gql`
         width
         height
       }
-      description(markdown: false)
+      description(markdown: ${isWeb})
       coverImage {
         alt
         id

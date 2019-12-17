@@ -1,12 +1,20 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Platform } from 'react-native';
 import styled from 'styled-components/native';
+
+export const isWeb = Platform.OS === 'web';
 
 export const Container = styled.View`
   align-items: center;
-  flex: 1;
+  max-width: 100%;
+  width: 400px;
 `;
-export const View = styled.View``;
+export const View = styled.View`
+  max-width: 100%;
+`;
+export const NewsContainer = styled(View)`
+  justify-content: center;
+`;
 export const AbsoluteFill = styled.View`
   position: absolute;
   top: 0;
@@ -21,7 +29,6 @@ export const Text = styled.Text`
 `;
 export const Title = styled(Text)`
   font-size: 20px;
-  flex: 1;
 `;
 export const CenterText = styled(Text)`
   text-align: center;
@@ -31,6 +38,7 @@ export const DateText = styled(Text)`
 `;
 export const Image = styled.Image`
   resizeMode: contain;
+  align-self: center;
   max-height: 300px;
   max-width: 100%;
 `;
@@ -41,6 +49,7 @@ export const FlexImage = styled(Image)`
   flex: 1;
 `;
 export const StyledScrollView = styled.ScrollView`
+  max-width: 100%;
   padding: 5px;
 `;
 
@@ -56,7 +65,7 @@ export const Root = styled(Row)`
   background: #000;
 `;
 export const Main = styled.ScrollView`
-  padding: 5px;
+  padding: 10px;
   flex: 1;
 `;
 export const Sidebar = styled.View`
@@ -79,15 +88,18 @@ export const Social = styled.View``;
 export const MobileHeader = styled.View``;
 export const MobileHeaderMenu = styled.View`
   position: absolute;
-  left: 0;
+  left: 5px;
+  top: 5px;
 `;
 export const MobileHeaderLogo = styled.View``;
 export const SocialByProfile = () => <Social />;
 
 export const mainStyles = StyleSheet.create({
   scrollContent: {
-    marginBottom: 40,
+    justifyContent: 'center',
+    alignSelf: 'center',
     paddingBottom: 40,
+    marginBottom: 40,
   },
   container: {
     flex: 1,

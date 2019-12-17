@@ -1,11 +1,14 @@
 import React from 'react';
 import gql from 'graphql-tag';
+import { ScrollView } from 'react-native';
 
 import useRevalidateOnFocus from '../src/hooks/useRevalidateOnFocus';
 import {
   DateText,
   DatoImage,
   Image,
+  isWeb,
+  NewsContainer,
   Text,
   Title,
   View,
@@ -39,7 +42,7 @@ export function Page({
 function NewsContent({ newsContent }) {
   return newsContent.map(
     ({ gallery, image, where, when, video, title, id, content }) => (
-      <View key={id}>
+      <NewsContainer key={id}>
         {title ? <Text>{title}</Text> : null}
         {when ? <Text>{when}</Text> : null}
         {where ? (
@@ -51,7 +54,7 @@ function NewsContent({ newsContent }) {
         {image ? <DatoImage image={image} /> : null}
         {gallery ? <NewsGallery gallery={gallery} /> : null}
         {video ? <NewsVideo video={video} /> : null}
-      </View>
+      </NewsContainer>
     ),
   );
 }
@@ -72,14 +75,33 @@ function NewsVideo({
   );
 }
 function NewsGallery({ gallery }) {
-  return gallery.map(({ url, alt, width, height }) => (
-    <Image
-      key={url}
-      alt={alt}
-      source={{ uri: url }}
-      style={{ width, height }}
-    />
-  ));
+  return (
+    <View>
+      {gallery.length ? (
+        <ScrollView
+          horizontal
+          style={{
+            flex: 1,
+            maxHeight: 500,
+            minHeight: 0,
+            height: 500,
+          }}
+          contentContainerStyle={{
+            maxWidth: gallery.length * 300,
+          }}
+        >
+          {gallery.map(({ url, alt, width, height }) => (
+            <Image
+              key={url}
+              alt={alt}
+              source={{ uri: url }}
+              style={{ width, height, maxWidth: 300 }}
+            />
+          ))}
+        </ScrollView>
+      ) : null}
+    </View>
+  );
 }
 
 export const Query = gql`
@@ -116,7 +138,7 @@ export const Query = gql`
         title
         id
         updatedAt
-        content(markdown: false)
+        content(markdown: ${isWeb})
       }
       _seoMetaTags {
         tag
