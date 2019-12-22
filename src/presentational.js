@@ -36,18 +36,23 @@ export const CenterText = styled(Text)`
 export const DateText = styled(Text)`
   font-size: 14px;
 `;
+
+// prettier-ignore
 export const Image = styled.Image`
   resizeMode: contain;
   align-self: center;
   max-height: 300px;
   max-width: 100%;
 `;
+
+// prettier-ignore
 export const FlexImage = styled(Image)`
   resizeMode: contain;
   min-height: 300px;
   width: 100%;
   flex: 1;
 `;
+
 export const StyledScrollView = styled.ScrollView`
   max-width: 100%;
   padding: 5px;

@@ -9,7 +9,8 @@ import { client } from './data/datocms';
 import {
   CenterText,
   Container,
-  ErrorView, isWeb,
+  ErrorView,
+  isWeb,
   Main,
   mainStyles,
   MobileHeader,

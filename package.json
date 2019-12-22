@@ -14,9 +14,9 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "eject": "expo eject",
-    "lint": "eslint ./{src,pages}/ ./*.js --ext .js",
-    "fix": "eslint --fix ./{src,pages}/ ./*.js --ext .js",
-    "format": "prettier --write ./{src,pages}/**/*.js ./*.{js,json}"
+    "lint": "eslint \"{src,pages}/**/*.js\" \"./*.js\"",
+    "fix": "eslint --fix \"{src,pages}/**/*.js\" \"./*.js\"",
+    "format": "prettier --write \"{src,pages}/**/*.js\" \"./*.{js,json}\""
   },
   "dependencies": {
     "@apollo/react-hooks": "^3.1.3",
