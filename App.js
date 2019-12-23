@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/react-hooks';
 
 import { ErrorView, Text } from './src/presentational';
 import RouteContext from './src/RouteContext';
-import { client } from './src/data/datocms';
+import { client } from './src/data';
 import * as index from './pages/index';
 import routes from './routes.native';
 

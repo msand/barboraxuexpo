@@ -5,7 +5,7 @@ import gql from 'graphql-tag';
 import Seo from './Seo';
 import Link from './Link';
 import Markdown from './Markdown';
-import { client } from './data/datocms';
+import { client } from './data';
 import {
   CenterText,
   Container,

@@ -3,7 +3,7 @@ import gql from 'graphql-tag';
 import expr from 'expression-eval';
 import { useQuery } from '@apollo/react-hooks';
 
-import { client } from '../src/data/datocms';
+import { client } from '../src/data';
 import { LoadingView, ErrorView, Text } from '../src/presentational';
 
 const add = (a, b) => a + b;
@@ -184,9 +184,11 @@ function astDfs(G, visit, v, order) {
   }
   if (object) {
     astDfs(G, visit, object, order);
+    return;
   }
   if (argument) {
     astDfs(G, visit, argument, order);
+    return;
   }
   if (left) {
     astDfs(G, visit, left, order);
@@ -457,12 +459,12 @@ function compileRender(match, patterns, params, render) {
         const pad = '  '.repeat(level);
         const pre = condition
           ? `if (${condition}) {
-${pad}`
-          : ``;
+  ${pad}`
+          : '';
         const post = condition
           ? `
-}`
-          : ``;
+  }`
+          : '';
         return `${pre}${
           Array.isArray(output)
             ? `return (<>${compileChildren(output, level, overrides)}

@@ -1,5 +1,5 @@
 const gql = require('graphql-tag');
-const { query } = require('./src/data/datocms');
+const { query } = require('./src/data');
 
 const allSlugs = gql`
   query allSlugs {

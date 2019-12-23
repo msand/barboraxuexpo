@@ -1,4 +1,4 @@
-import { query } from './datocms';
+import { query } from './index';
 
 export default async (res, gqlQuery, variables) => {
   const result = await query(gqlQuery, variables);
