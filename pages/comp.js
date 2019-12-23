@@ -4,10 +4,8 @@ import expr from 'expression-eval';
 import { useQuery } from '@apollo/react-hooks';
 
 import { client } from '../src/data';
+import { add, Bold } from '../src/namespace';
 import { LoadingView, ErrorView, Text } from '../src/presentational';
-
-const add = (a, b) => a + b;
-const Bold = ({ children }) => <b>{children}</b>;
 
 const viewExample = {
   tag: 'name',
@@ -202,15 +200,15 @@ function dfs(G, visit, v, order) {
   const vertex = G[v] || (G[v] = {});
   const V = getVertex(vertex);
   if (V) {
-    if (isCode(vertex)) {
-      astDfs(G, visit, V, order);
-    } else if (Array.isArray(vertex)) {
+    if (Array.isArray(V)) {
       for (const e of V) {
         const nextVertex = getVertex(e);
         if (visit[nextVertex] !== true) {
           dfs(G, visit, nextVertex, order);
         }
       }
+    } else if (isCode(vertex)) {
+      astDfs(G, visit, V, order);
     } else {
       // console.log("not a variable", v, vertex, V);
     }
@@ -301,10 +299,10 @@ export function Preview(props) {
         // console.log(varName, variable);
       } else if (Array.isArray(variable)) {
         const [funcName, ...args] = variable;
-        const func = vars[funcName.v];
+        const func = getVarOrPrimitive(vars, funcName);
         vars[varName] = func(...args.map(arg => getVarOrPrimitive(vars, arg)));
       } else if (isCode(variable)) {
-        const fn = expr.compile(variable.c);
+        const fn = expr.compile(getCode(variable));
         vars[varName] = fn(vars);
       }
     }
@@ -550,10 +548,14 @@ export default function Page(props) {
                 if (!variable) {
                   // console.log(varName, variable);
                 } else if (Array.isArray(variable)) {
-                  const [funcName, ...args] = variable;
-                  return `let ${varName} = ${funcName.v}(${args
-                    .map(arg => (typeof arg === 'object' ? arg.v : arg))
-                    .join(', ')});`;
+                  const [funcName, ...params] = variable;
+                  const func = getVarNameOrValue(funcName);
+                  const args = params
+                    .map(p =>
+                      typeof p === 'object' ? getVarNameOrValue(p) : p,
+                    )
+                    .join(', ');
+                  return `let ${varName} = ${func}(${args});`;
                 } else if (isCode(variable)) {
                   return `let ${varName} = ${getCode(variable)};`;
                 }
@@ -570,39 +572,39 @@ export default function Page(props) {
   );
 }
 
+const styles = {
+  container: {
+    color: 'black',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  output: { border: '1px solid black', margin: 10, padding: 10 },
+};
+const namespace = { add, Bold };
+const variables = {
+  data: {
+    isAdmin: true,
+  },
+};
 export default function Test() {
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        color: 'black',
-      }}
-    >
+    <div style={styles.container}>
       <h1>Preview</h1>
-      <output style={{ border: '1px solid black', margin: 10, padding: 10 }}>
+      <output style={styles.output}>
         <Previewer
           client={client}
           component={viewExample}
-          namespace={{ add, Bold }}
-          variables={{
-            data: {
-              isAdmin: true,
-            },
-          }}
+          namespace={namespace}
+          variables={variables}
         />
       </output>
-      <h1 style={{ marginBottom: 0 }}>Code</h1>
-      <output style={{ border: '1px solid black', margin: 10, padding: 10 }}>
+      <h1>Code</h1>
+      <output style={styles.output}>
         <Compiler
           client={client}
           component={viewExample}
-          namespace={{ add, Bold }}
-          variables={{
-            data: {
-              isAdmin: true,
-            },
-          }}
+          namespace={namespace}
+          variables={variables}
         />
       </output>
     </div>
