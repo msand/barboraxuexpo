@@ -36,6 +36,7 @@ const viewExample = {
       type: 'HomePageQueryType',
     },
   },
+  // hooks need to be called first and always in same order, sort topologically
   compute: {
     // dag
     variableName: [
@@ -43,21 +44,11 @@ const viewExample = {
       { v: 'propName' }, // take first argument from parameter 'propName'
       { v: 'variableName2' }, // second argument from another variable
     ],
-    variableName2: [
-      // hooks need to be called first and always in same order, sort topologically
-      { v: 'add' },
-      1,
-      2,
-    ],
-    isAdmin:
-      // short js expressions / code blocks
-      { c: 'query.isAdmin || rootUser' },
-    didSucceed:
-      // short js expressions / code blocks
-      { c: 'intro !== null' },
-    intro:
-      // short js expressions / code blocks
-      { c: 'query.home.introText' },
+    variableName2: [{ v: 'add' }, 1, 2],
+    // short js expressions / code blocks
+    isAdmin: { c: 'query.isAdmin || rootUser' },
+    didSucceed: { c: 'intro !== null' },
+    intro: { c: 'query.home.introText' },
   },
   match: {
     // list
