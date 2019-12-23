@@ -127,6 +127,14 @@ export const ScrollView = ({ style, children, contentContainerStyle }) => (
   </StyledScrollView>
 );
 
+export function LoadingView({ children }) {
+  return (
+    <View style={mainStyles.container}>
+      {typeof children === 'string' ? <Text>{children}</Text> : children}
+    </View>
+  );
+}
+
 export function ErrorView({ children }) {
   return (
     <View style={mainStyles.container}>

@@ -39,24 +39,25 @@ export function Page({
     </Layout>
   );
 }
-function NewsContent({ newsContent }) {
-  return newsContent.map(
-    ({ gallery, image, where, when, video, title, id, content }) => (
-      <NewsContainer key={id}>
-        {title ? <Text>{title}</Text> : null}
-        {when ? <Text>{when}</Text> : null}
-        {where ? (
-          <Text>
-            long: {where.longitude} lat: {where.latitude}
-          </Text>
-        ) : null}
-        {content ? <Markdown>{content}</Markdown> : null}
-        {image ? <DatoImage image={image} /> : null}
-        {gallery ? <NewsGallery gallery={gallery} /> : null}
-        {video ? <NewsVideo video={video} /> : null}
-      </NewsContainer>
-    ),
+function NewsItem({ gallery, image, where, when, video, title, id, content }) {
+  return (
+    <NewsContainer key={id}>
+      {title ? <Text>{title}</Text> : null}
+      {when ? <Text>{when}</Text> : null}
+      {where ? (
+        <Text>
+          long: {where.longitude} lat: {where.latitude}
+        </Text>
+      ) : null}
+      {content ? <Markdown>{content}</Markdown> : null}
+      {image ? <DatoImage image={image} /> : null}
+      {gallery ? <NewsGallery gallery={gallery} /> : null}
+      {video ? <NewsVideo video={video} /> : null}
+    </NewsContainer>
   );
+}
+function NewsContent({ newsContent }) {
+  return newsContent.map(NewsItem);
 }
 function NewsVideo({
   video: { url, title, thumbnailUrl, alt, width, height },

@@ -4,7 +4,7 @@ import expr from 'expression-eval';
 import { useQuery } from '@apollo/react-hooks';
 
 import { client } from '../src/data/datocms';
-import { ErrorView, Text } from '../src/presentational';
+import { LoadingView, ErrorView, Text } from '../src/presentational';
 
 const add = (a, b) => a + b;
 const Bold = ({ children }) => <b>{children}</b>;
@@ -47,8 +47,8 @@ const viewExample = {
     variableName2: [{ v: 'add' }, 1, 2],
     // short js expressions / code blocks
     isAdmin: { c: 'query.isAdmin || rootUser' },
-    didSucceed: { c: 'intro !== null' },
-    intro: { c: 'query.home.introText' },
+    intro: { c: 'query && query.home && query.home.introText' },
+    didSucceed: { c: '!!intro' },
   },
   match: {
     // list
@@ -190,20 +190,23 @@ function astDfs(G, visit, v, order) {
 }
 function dfs(G, visit, v, order) {
   visit[v] = true;
-  const vertex = G[v];
+  const vertex = G[v] || (G[v] = {});
   const V = getVertex(vertex);
   if (V) {
     if (isCode(vertex)) {
       astDfs(G, visit, V, order);
-    } else {
+    } else if (Array.isArray(vertex)) {
       for (const e of V) {
-        if (visit[e] !== true) {
-          dfs(G, visit, e, order);
+        const nextVertex = getVertex(e);
+        if (visit[nextVertex] !== true) {
+          dfs(G, visit, nextVertex, order);
         }
       }
+    } else {
+      // console.log("not a variable", v, vertex, V);
     }
+    order.push(v);
   }
-  order.push(v);
 }
 function topologicalSort(G) {
   const order = [];
@@ -215,7 +218,7 @@ function topologicalSort(G) {
     }
   }
 
-  return order.reverse();
+  return order;
 }
 
 function extract(props, key, actualProps, vars) {
@@ -334,9 +337,9 @@ export function Previewer(props) {
     );
     if (loading) {
       return (
-        <ErrorView>
+        <LoadingView>
           <Text>Loading...</Text>
-        </ErrorView>
+        </LoadingView>
       );
     }
     if (error) {
@@ -389,7 +392,7 @@ function compileChild(pad, level, overrides) {
   const getter = overrides ? getVarWithOverride : getVarNameOrValue;
   return child => {
     if (!child) {
-      return ``;
+      return '';
     }
     const isString = typeof child === 'string';
     if (isString) {
@@ -409,9 +412,8 @@ function compileChild(pad, level, overrides) {
         const val = getter(value, key, overrides);
         if (key !== 'style' || typeof val !== 'object') {
           return `${key}={${val}}`;
-        } else {
-          return `style={${compileStyles(val, nextLevel, overrides)}}`;
         }
+        return `style={${compileStyles(val, nextLevel, overrides)}}`;
       })
       .join(propsIndent)}${
       hasChildren
@@ -440,18 +442,29 @@ function compileRender(match, patterns, params, render) {
         const overrides = pattern[params.length + 1];
         const renderName = pattern[params.length];
         const output = render[renderName];
-        return `if (${params
+        const condition = params
           .map((param, i) => `${param} === ${pattern[i]}`)
           .filter((_, i) => pattern[i] !== null)
-          .join(' && ') || 'true'}) {
-    ${
-      Array.isArray(output)
-        ? `return (<>${compileChildren(output, 1, overrides)}
+          .join(' && ');
+        const level = condition ? 1 : 0;
+        const pad = '  '.repeat(level);
+        return `${
+          condition
+            ? `if (${condition}) {
+  ${pad}`
+            : ''
+        }${
+          Array.isArray(output)
+            ? `return (<>${compileChildren(output, level, overrides)}
     </>);`
-        : `return (${compileChildren([output], 1, overrides)}
-    );`
-    }
-  }`;
+            : `return (${compileChildren([output], level, overrides)}
+  ${pad});`
+        }${
+          condition
+            ? `
+  }`
+            : ''
+        }`;
       })
       .join('\n  ');
   }
