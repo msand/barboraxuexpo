@@ -53,7 +53,7 @@ const viewExample = {
       // short js expressions / code blocks
       { c: 'query.isAdmin || rootUser' },
   },
-  match_: {
+  match: {
     // list
     params: ['isAdmin', 'wasSuccessful'], // #n arguments (n = 2)
     // list
@@ -70,75 +70,75 @@ const viewExample = {
       [null, null, 'error', { overrideRenderProps: 'overriddenValue' }],
     ],
   },
-  // render: {
-  // single component
-  error: {
-    // error
-    tag: 'div',
-    props: {
-      propName: { v: 'var or prop' },
-      children: [
-        {
-          tag: 'Bold',
-          props: {
-            propName: { v: 'var or prop' },
-            children: ['Test text'],
-          },
-        },
-      ],
-    },
-  },
-  errorAdmin: {
-    tag: 'div',
-    props: {
-      propName: { v: 'var or prop' },
-      children: [],
-    },
-  },
-  // tree / fragment
-  render: [
-    // success
-    // only used variables from directed acyclic graph need to be computed,
-    // and if pure, only ones with changed inputs
-    {
+  render: {
+    // single component
+    error: {
+      // error
       tag: 'div',
       props: {
-        onClick: {
-          a: 'action name',
-          f: 'ref to payload producing function',
-          v: 'or payload variable name',
-        },
-        onDoubleClick: {
-          e: 'effect name',
-          f: 'event handling function',
-          v:
-            'variable name or array of names, to give as arguments when calling handler',
-        },
         propName: { v: 'var or prop' },
-        style: {
-          cssPropName: 'cssPropValue',
-          cssProp2: { v: 'var or prop' },
-        },
         children: [
           {
-            tag: 'div',
+            tag: 'Bold',
             props: {
               propName: { v: 'var or prop' },
-              children: [],
+              children: ['Test text'],
             },
           },
         ],
       },
     },
-    {
-      tag: 'Bold',
+    errorAdmin: {
+      tag: 'div',
       props: {
         propName: { v: 'var or prop' },
-        children: ['Test text'],
+        children: [],
       },
     },
-  ],
-  // },
+    // tree / fragment
+    success: [
+      // success
+      // only used variables from directed acyclic graph need to be computed,
+      // and if pure, only ones with changed inputs
+      {
+        tag: 'div',
+        props: {
+          onClick: {
+            a: 'action name',
+            f: 'ref to payload producing function',
+            v: 'or payload variable name',
+          },
+          onDoubleClick: {
+            e: 'effect name',
+            f: 'event handling function',
+            v:
+              'variable name or array of names, to give as arguments when calling handler',
+          },
+          propName: { v: 'var or prop' },
+          style: {
+            cssPropName: 'cssPropValue',
+            cssProp2: { v: 'var or prop' },
+          },
+          children: [
+            {
+              tag: 'div',
+              props: {
+                propName: { v: 'var or prop' },
+                children: [],
+              },
+            },
+          ],
+        },
+      },
+      {
+        tag: 'Bold',
+        props: {
+          propName: { v: 'var or prop' },
+          children: ['Test text'],
+        },
+      },
+    ],
+  },
 };
 
 const isVar = primitive => 'v' in primitive;
