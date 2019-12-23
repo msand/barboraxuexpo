@@ -52,10 +52,16 @@ const viewExample = {
     isAdmin:
       // short js expressions / code blocks
       { c: 'query.isAdmin || rootUser' },
+    didSucceed:
+      // short js expressions / code blocks
+      { c: 'intro !== null' },
+    intro:
+      // short js expressions / code blocks
+      { c: 'query.home.introText' },
   },
   match: {
     // list
-    params: ['isAdmin', 'wasSuccessful'], // #n arguments (n = 2)
+    params: ['isAdmin', 'didSucceed'], // #n arguments (n = 2)
     // list
     patterns: [
       // match patterns to given parameter arguments (#n predicates per pattern)
@@ -82,7 +88,7 @@ const viewExample = {
             tag: 'Bold',
             props: {
               propName: { v: 'var or prop' },
-              children: ['Test text'],
+              children: ['Test error text'],
             },
           },
         ],
@@ -92,7 +98,15 @@ const viewExample = {
       tag: 'div',
       props: {
         propName: { v: 'var or prop' },
-        children: [],
+        children: [
+          {
+            tag: 'Bold',
+            props: {
+              propName: { v: 'var or prop' },
+              children: ['Test admin error text'],
+            },
+          },
+        ],
       },
     },
     // tree / fragment
@@ -124,7 +138,7 @@ const viewExample = {
               tag: 'div',
               props: {
                 propName: { v: 'var or prop' },
-                children: [],
+                children: [{ v: 'intro' }],
               },
             },
           ],
@@ -224,16 +238,19 @@ function extract(props, key, actualProps, vars) {
 
 export function RenderPreview(props) {
   const { render, vars } = props;
+  if (!render || typeof render === 'string') {
+    return render;
+  }
+  if (isVar(render)) {
+    return getVar(vars, render);
+  }
   if (Array.isArray(render)) {
     return render.map((child, i) => (
       <RenderPreview key={i} render={child} vars={vars} />
     ));
   }
-  if (typeof render === 'string') {
-    return render;
-  }
   const { tag, props: renderProps } = render;
-  const { children, ...rest } = renderProps;
+  const { children, ...rest } = renderProps || {};
   const Tag = vars[tag] || tag;
   const actualProps = {};
   for (const key of Object.keys(rest)) {
@@ -380,12 +397,18 @@ function compileChild(pad, level, overrides) {
   const nextLevel = level + 1;
   const getter = overrides ? getVarWithOverride : getVarNameOrValue;
   return child => {
+    if (!child) {
+      return ``;
+    }
     const isString = typeof child === 'string';
     if (isString) {
       return `\n    ${pad}${child}`;
     }
+    if (isVar(child)) {
+      return `\n    ${pad}{${getVarName(child)}}`;
+    }
     const { props, tag } = child;
-    const { children, ...rest } = props;
+    const { children, ...rest } = props || {};
     const propEntries = Object.entries(rest);
     const hasMultipleProps = propEntries.length > 1;
     const hasChildren = children && children.length;
