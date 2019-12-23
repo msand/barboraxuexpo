@@ -233,20 +233,18 @@ export function RenderPreview(props) {
     return render;
   }
   const { tag, props: renderProps } = render;
-  const { children } = renderProps;
+  const { children, ...rest } = renderProps;
   const Tag = vars[tag] || tag;
   const actualProps = {};
-  for (const key of Object.keys(renderProps)) {
-    if (key !== 'children') {
-      if (key === 'style') {
-        const { style } = renderProps;
-        actualProps.style = {};
-        const actualStyles = actualProps.style;
-        for (const styleKey of Object.keys(style)) {
-          extract(style, styleKey, actualStyles, vars);
-        }
-      } else {
-        extract(renderProps, key, actualProps, vars);
+  for (const key of Object.keys(rest)) {
+    if (key !== 'style') {
+      extract(renderProps, key, actualProps, vars);
+    } else {
+      const { style } = renderProps;
+      actualProps.style = {};
+      const actualStyles = actualProps.style;
+      for (const styleKey of Object.keys(style)) {
+        extract(style, styleKey, actualStyles, vars);
       }
     }
   }
@@ -395,9 +393,11 @@ function compileChild(pad, level, overrides) {
     ${pad}<${tag} ${hasMultipleProps ? propsIndent : ''}${propEntries
       .map(([key, value]) => {
         const val = getter(value, key, overrides);
-        return key === 'style' && typeof val === 'object'
-          ? `style={${compileStyles(val, nextLevel, overrides)}}`
-          : `${key}={${val}}`;
+        if (key !== 'style' || typeof val !== 'object') {
+          return `${key}={${val}}`;
+        } else {
+          return `style={${compileStyles(val, nextLevel, overrides)}}`;
+        }
       })
       .join(propsIndent)}${
       hasChildren
