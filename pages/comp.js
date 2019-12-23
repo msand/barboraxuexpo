@@ -476,7 +476,6 @@ export function Compiler(props) {
       {`
 import React from 'react';
 import gql from 'graphql-tag';
-import expr from 'expression-eval';
 import { useQuery } from '@apollo/react-hooks';
 
 import { client } from '../src/data';
