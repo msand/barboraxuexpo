@@ -170,22 +170,29 @@ function getVertex(e) {
     return getVarName(e);
   }
   if (isCode(e)) {
-    return expr.parse(e);
+    return expr.parse(getCode(e));
   }
   return e;
 }
 function astDfs(G, visit, v, order) {
-  if (v.type === 'Identifier') {
-    const e = v.name;
-    if (visit[e] !== true) {
-      dfs(G, visit, e, order);
+  const { type, name, object, argument, left, right } = v;
+  if (type === 'Identifier') {
+    if (visit[name] !== true) {
+      dfs(G, visit, name, order);
     }
+    return;
   }
-  if (v.left) {
-    astDfs(G, visit, v.left, order);
+  if (object) {
+    astDfs(G, visit, object, order);
   }
-  if (v.right) {
-    astDfs(G, visit, v.right, order);
+  if (argument) {
+    astDfs(G, visit, argument, order);
+  }
+  if (left) {
+    astDfs(G, visit, left, order);
+  }
+  if (right) {
+    astDfs(G, visit, right, order);
   }
 }
 function dfs(G, visit, v, order) {
@@ -448,23 +455,21 @@ function compileRender(match, patterns, params, render) {
           .join(' && ');
         const level = condition ? 1 : 0;
         const pad = '  '.repeat(level);
-        return `${
-          condition
-            ? `if (${condition}) {
-  ${pad}`
-            : ''
-        }${
+        const pre = condition
+          ? `if (${condition}) {
+${pad}`
+          : ``;
+        const post = condition
+          ? `
+}`
+          : ``;
+        return `${pre}${
           Array.isArray(output)
             ? `return (<>${compileChildren(output, level, overrides)}
     </>);`
             : `return (${compileChildren([output], level, overrides)}
   ${pad});`
-        }${
-          condition
-            ? `
-  }`
-            : ''
-        }`;
+        }${post}`;
       })
       .join('\n  ');
   }
