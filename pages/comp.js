@@ -141,10 +141,10 @@ const viewExample = {
   },
 };
 
-const isVar = primitive => 'v' in primitive;
-const isCode = primitive => 'c' in primitive;
 const getCode = prop => prop.c;
 const getVarName = prop => prop.v;
+const isVar = prop => 'v' in prop;
+const isCode = prop => 'c' in prop;
 const getVarNameOrValue = prop => prop.v || prop;
 const getVar = (vars, prop) => vars[prop.v];
 const getVarOrPrimitive = (vars, prop) => {
