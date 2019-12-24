@@ -282,7 +282,7 @@ export function RenderPreview(props) {
 }
 
 function matchPattern(paramValues, length, pattern) {
-  for (let i = 0, l = length; i < l; i += 1) {
+  for (let i = 0; i < length; i += 1) {
     const condition = pattern[i];
     if (condition !== null && paramValues[i] !== condition) {
       return false;
@@ -383,9 +383,8 @@ function getVarWithOverride(value, key, overrides) {
   return overrides[key] || getVarNameOrValue(value);
 }
 
-function compileStyles(styles, level, overrides) {
+function compileStyles(styles, level, overrides, getter) {
   const pad = '  '.repeat(level);
-  const getter = overrides ? getVarWithOverride : getVarNameOrValue;
   const nl = '\n    ';
   const body = `${nl}  ${pad}`;
   return `{${body}${Object.entries(styles)
@@ -423,7 +422,7 @@ function compileChild(pad, level, overrides) {
         if (key !== 'style' || notObj(val)) {
           return `${key}={${val}}`;
         }
-        return `style={${compileStyles(val, next, overrides)}}`;
+        return `style={${compileStyles(val, next, overrides, getter)}}`;
       })
       .join(propsIndent);
     const start = `<${tag} ${preAttrs}${attrs}`;
