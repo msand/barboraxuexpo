@@ -153,13 +153,15 @@ const viewExample = {
 
 const getCode = prop => prop.c;
 const getVarName = prop => prop.v;
+const isObj = v => typeof v === 'object';
+const notObj = v => typeof v !== 'object';
 const hasOwn = Object.prototype.hasOwnProperty;
 const isVar = prop => hasOwn.call(prop, 'v');
 const isCode = prop => hasOwn.call(prop, 'c');
 const getVarNameOrValue = prop => prop.v || prop;
 const getVar = (vars, prop) => vars[prop.v];
 const getVarOrPrimitive = (vars, prop) => {
-  if (typeof prop !== 'object') {
+  if (notObj(prop)) {
     return prop;
   }
   if (isVar(prop)) {
@@ -169,7 +171,7 @@ const getVarOrPrimitive = (vars, prop) => {
 };
 
 function getVertex(e) {
-  if (!e || typeof e !== 'object') {
+  if (!e || notObj(e)) {
     return e;
   }
   if (isVar(e)) {
@@ -236,13 +238,9 @@ function topologicalSort(G) {
   return order;
 }
 
-function extract(props, key, actualProps, vars) {
-  const prop = props[key];
-  if (typeof prop === 'object' && isVar(prop)) {
-    actualProps[key] = getVar(vars, prop);
-  } else {
-    actualProps[key] = prop;
-  }
+function extract(props, key, target, vars) {
+  const v = props[key];
+  target[key] = isObj(v) && isVar(v) ? getVar(vars, v) : v;
 }
 
 export function RenderPreview(props) {
@@ -259,20 +257,18 @@ export function RenderPreview(props) {
     ));
   }
   const { tag, props: renderProps } = render;
-  const { children, ...rest } = renderProps || {};
+  const { children, style, ...rest } = renderProps || {};
   const Tag = vars[tag] || tag;
   const actualProps = {};
-  for (const key of Object.keys(rest)) {
-    if (key !== 'style') {
-      extract(renderProps, key, actualProps, vars);
-    } else {
-      const { style } = renderProps;
-      actualProps.style = {};
-      const actualStyles = actualProps.style;
-      for (const styleKey of Object.keys(style)) {
-        extract(style, styleKey, actualStyles, vars);
-      }
+  if (style) {
+    actualProps.style = {};
+    const actualStyles = actualProps.style;
+    for (const styleKey of Object.entries(style)) {
+      extract(style, styleKey, actualStyles, vars);
     }
+  }
+  for (const key of Object.keys(rest)) {
+    extract(renderProps, key, actualProps, vars);
   }
   return (
     <Tag {...actualProps}>
@@ -424,7 +420,7 @@ function compileChild(pad, level, overrides) {
     const attrs = propEntries
       .map(([key, value]) => {
         const val = getter(value, key, overrides);
-        if (key !== 'style' || typeof val !== 'object') {
+        if (key !== 'style' || notObj(val)) {
           return `${key}={${val}}`;
         }
         return `style={${compileStyles(val, next, overrides)}}`;
@@ -539,7 +535,7 @@ export default function Page(props) {
               const [funcName, ...params] = variable;
               const func = getVarNameOrValue(funcName);
               const args = params
-                .map(p => (typeof p === 'object' ? getVarNameOrValue(p) : p))
+                .map(p => (isObj(p) ? getVarNameOrValue(p) : p))
                 .join(', ');
               return `let ${varName} = ${func}(${args});`;
             } else if (isCode(variable)) {
