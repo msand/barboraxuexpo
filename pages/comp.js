@@ -1,3 +1,10 @@
+/* eslint
+react/jsx-props-no-spreading: "off",
+react/no-array-index-key: "off",
+no-restricted-syntax: "off",
+no-use-before-define: "off",
+no-param-reassign: "off",
+*/
 import React from 'react';
 import gql from 'graphql-tag';
 import expr from 'expression-eval';
@@ -5,7 +12,7 @@ import { useQuery } from '@apollo/react-hooks';
 
 import { client } from '../src/data';
 import { add, Bold } from '../src/namespace';
-import { LoadingView, ErrorView, Text } from '../src/presentational';
+import { ErrorView, LoadingView, Text } from '../src/presentational';
 
 const viewExample = {
   tag: 'name',
@@ -146,8 +153,9 @@ const viewExample = {
 
 const getCode = prop => prop.c;
 const getVarName = prop => prop.v;
-const isVar = prop => 'v' in prop;
-const isCode = prop => 'c' in prop;
+const hasOwn = Object.prototype.hasOwnProperty;
+const isVar = prop => hasOwn.call(prop, 'v');
+const isCode = prop => hasOwn.call(prop, 'c');
 const getVarNameOrValue = prop => prop.v || prop;
 const getVar = (vars, prop) => vars[prop.v];
 const getVarOrPrimitive = (vars, prop) => {
@@ -197,7 +205,7 @@ function astDfs(G, visit, v, order) {
 }
 function dfs(G, visit, v, order) {
   visit[v] = true;
-  const vertex = G[v] || (G[v] = {});
+  const vertex = G[v];
   const V = getVertex(vertex);
   if (V) {
     if (Array.isArray(V)) {
@@ -217,7 +225,7 @@ function dfs(G, visit, v, order) {
 }
 function topologicalSort(G) {
   const order = [];
-  const visit = {};
+  const visit = Object.create(null);
 
   for (const v of Object.keys(G)) {
     if (visit[v] !== true) {
@@ -330,7 +338,7 @@ export function Preview(props) {
   return <RenderPreview render={render} vars={vars} />;
 }
 export function Previewer(props) {
-  const { component, client, namespace, variables } = props;
+  const { component, namespace, variables } = props;
   const { query } = component;
   if (query) {
     const { loading, data, error } = useQuery(
@@ -382,21 +390,21 @@ function getVarWithOverride(value, key, overrides) {
 function compileStyles(styles, level, overrides) {
   const pad = '  '.repeat(level);
   const getter = overrides ? getVarWithOverride : getVarNameOrValue;
-  return `{
-      ${pad}${Object.entries(styles)
+  const nl = '\n    ';
+  const body = `${nl}  ${pad}`;
+  return `{${body}${Object.entries(styles)
     .map(([key, value]) => {
       const val = getter(value, key, overrides);
       return `${key}: ${val}`;
     })
-    .join(`,\n      ${pad}`)}
-    ${pad}}`;
+    .join(`,${body}`)}${nl}${pad}}`;
 }
 
 function compileChild(pad, level, overrides) {
+  const getter = overrides ? getVarWithOverride : getVarNameOrValue;
   const propsIndent = `\n      ${pad}`;
   const childIndent = `\n    ${pad}`;
-  const nextLevel = level + 1;
-  const getter = overrides ? getVarWithOverride : getVarNameOrValue;
+  const next = level + 1;
   return child => {
     if (!child) {
       return '';
@@ -412,26 +420,22 @@ function compileChild(pad, level, overrides) {
     const { children, ...rest } = props || {};
     const propEntries = Object.entries(rest);
     const hasMultipleProps = propEntries.length > 1;
-    const hasChildren = children && children.length;
-    return `
-    ${pad}<${tag} ${hasMultipleProps ? propsIndent : ''}${propEntries
+    const preAttrs = hasMultipleProps ? propsIndent : '';
+    const attrs = propEntries
       .map(([key, value]) => {
         const val = getter(value, key, overrides);
         if (key !== 'style' || typeof val !== 'object') {
           return `${key}={${val}}`;
         }
-        return `style={${compileStyles(val, nextLevel, overrides)}}`;
+        return `style={${compileStyles(val, next, overrides)}}`;
       })
-      .join(propsIndent)}${
-      hasChildren
-        ? `${hasMultipleProps ? childIndent : ''}>${compileChildren(
-            children,
-            nextLevel,
-            overrides,
-          )}
-    ${pad}</${tag}>`
-        : ' />'
-    }`;
+      .join(propsIndent);
+    const start = `<${tag} ${preAttrs}${attrs}`;
+    const hasChildren = children && children.length;
+    const postAttrs = hasMultipleProps ? childIndent : '';
+    const inner = hasChildren && compileChildren(children, next, overrides);
+    const end = inner ? `${postAttrs}>${inner}${childIndent}</${tag}>` : ' />';
+    return `${childIndent}${start}${end}`;
   };
 }
 
@@ -442,8 +446,11 @@ function compileChildren(children, level, overrides) {
     : '';
 }
 
-function compileRender(match, patterns, params, render) {
+function compileRender(match, render) {
+  const nl = '\n  ';
+  const returnIndent = `${nl}  `;
   if (match) {
+    const { params, patterns } = match;
     return patterns
       .map(pattern => {
         const overrides = pattern[params.length + 1];
@@ -455,63 +462,44 @@ function compileRender(match, patterns, params, render) {
           .join(' && ');
         const level = condition ? 1 : 0;
         const pad = '  '.repeat(level);
-        const pre = condition
-          ? `if (${condition}) {
-  ${pad}`
-          : '';
-        const post = condition
-          ? `
-  }`
-          : '';
-        return `${pre}${
-          Array.isArray(output)
-            ? `return (<>${compileChildren(output, level, overrides)}
-    </>);`
-            : `return (${compileChildren([output], level, overrides)}
-  ${pad});`
-        }${post}`;
+        const body = `${nl}${pad}`;
+        const pre = condition ? `if (${condition}) {${body}` : '';
+        const post = condition ? `${nl}}` : '';
+        const compiledChildren = Array.isArray(output)
+          ? `return (<>${compileChildren(
+              output,
+              level,
+              overrides,
+            )}${returnIndent}</>);`
+          : `return (${compileChildren([output], level, overrides)}${body});`;
+        return `${pre}${compiledChildren}${post}`;
       })
-      .join('\n  ');
+      .join(nl);
   }
   if (Array.isArray(render)) {
-    return `return (
-    <>${compileChildren(render, 1)}
-    </>
-  );`;
+    const compiledChildren = compileChildren(render, 1);
+    return `return (${returnIndent}<>${compiledChildren}${returnIndent}</>${nl});`;
   }
-  return `return (${compileChildren([render], 0, null)}
-  );`;
+  return `return (${compileChildren([render], 0, null)}${nl});`;
 }
 
-export function Compiler(props) {
-  const { component, namespace, variables } = props;
+export function compile(props) {
+  const { component, namespace } = props;
   const { query, compute, match, render } = component;
+  const compiledRender = compileRender(match, render);
   const linearVariableOrder = compute && topologicalSort(compute);
-  const { params, patterns } = match || {};
-  const compiledRender = compileRender(match, patterns, params, render);
-  return (
-    <pre style={{ margin: 0 }}>
-      {`
-import React from 'react';
+  return `import React from 'react';
 import gql from 'graphql-tag';
 import { useQuery } from '@apollo/react-hooks';
 
 import { client } from '../src/data';
 import { ${Object.keys(namespace).join(', ')} } from '../src/namespace';
 import { ErrorView, LoadingView, Text } from '../src/presentational';
-${
-  query
-    ? `
-const Query = gql\`${query}\`;
-`
-    : ''
-}
+${query ? `\nconst Query = gql\`${query}\`;\n` : ''}
 export default function Page(props) {
   let { ${Object.entries(component.props)
     .map(([key, val]) =>
-      typeof val === 'object' && 'default' in val
-        ? `${key} = ${val.default}`
-        : key,
+      hasOwn.call(val, 'default') ? `${key} = ${val.default}` : key,
     )
     .join(', ')} } = props;
   ${
@@ -538,41 +526,38 @@ export default function Page(props) {
   `
       : ''
   }${
-        compute
-          ? linearVariableOrder
-              .map(varName => {
-                let variable = compute[varName];
-                if (variable === undefined) {
-                  variable = namespace[varName];
-                }
-                if (!variable) {
-                  // console.log(varName, variable);
-                } else if (Array.isArray(variable)) {
-                  const [funcName, ...params] = variable;
-                  const func = getVarNameOrValue(funcName);
-                  const args = params
-                    .map(p =>
-                      typeof p === 'object' ? getVarNameOrValue(p) : p,
-                    )
-                    .join(', ');
-                  return `let ${varName} = ${func}(${args});`;
-                } else if (isCode(variable)) {
-                  return `let ${varName} = ${getCode(variable)};`;
-                }
-                return false;
-              })
-              .filter(Boolean)
-              .join('\n  ')
-          : ''
-      }
+    compute
+      ? linearVariableOrder
+          .map(varName => {
+            let variable = compute[varName];
+            if (variable === undefined) {
+              variable = namespace[varName];
+            }
+            if (!variable) {
+              // console.log(varName, variable);
+            } else if (Array.isArray(variable)) {
+              const [funcName, ...params] = variable;
+              const func = getVarNameOrValue(funcName);
+              const args = params
+                .map(p => (typeof p === 'object' ? getVarNameOrValue(p) : p))
+                .join(', ');
+              return `let ${varName} = ${func}(${args});`;
+            } else if (isCode(variable)) {
+              return `let ${varName} = ${getCode(variable)};`;
+            }
+            return false;
+          })
+          .filter(Boolean)
+          .join('\n  ')
+      : ''
+  }
   ${compiledRender}
 }
-`}
-    </pre>
-  );
+`;
 }
 
 const styles = {
+  pre: { margin: 0 },
   container: {
     color: 'black',
     display: 'flex',
@@ -580,6 +565,12 @@ const styles = {
   },
   output: { border: '1px solid black', margin: 10, padding: 10 },
 };
+
+export function Compiler(props) {
+  const code = compile(props);
+  return <pre style={styles.pre}>{code}</pre>;
+}
+
 const namespace = { add, Bold };
 const variables = {
   data: {
@@ -592,7 +583,6 @@ export default function Test() {
       <h1>Preview</h1>
       <output style={styles.output}>
         <Previewer
-          client={client}
           component={viewExample}
           namespace={namespace}
           variables={variables}
@@ -601,7 +591,6 @@ export default function Test() {
       <h1>Code</h1>
       <output style={styles.output}>
         <Compiler
-          client={client}
           component={viewExample}
           namespace={namespace}
           variables={variables}
