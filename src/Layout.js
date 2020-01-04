@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 
+import Firefox from './firefox.svg';
 import Seo from './Seo';
 import Link from './Link';
 import Markdown from './Markdown';
@@ -146,6 +147,7 @@ function Layout({ children }) {
           </MobileHeaderLogo>
         </MobileHeader>
         <Container>{children}</Container>
+        <Firefox />
       </Main>
       <MobileHeaderMenu>
         <SidebarButton
